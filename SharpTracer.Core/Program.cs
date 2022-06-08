@@ -6,6 +6,7 @@ using SharpTracer.Core.Logging;
 using SharpTracer.Core.Material;
 using SharpTracer.Core.Renderer;
 using SharpTracer.Core.Utility;
+using SimpleImageIO;
 
 namespace SharpTracer.Core;
 
@@ -13,48 +14,129 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        const string folderPath = @"C:\Users\ASUS\Downloads";
+        const string folderPath = @"C:\Users\JJ\Videos";
         const string fileName = "pathtracing.png";
         string fullPath = Path.Combine(folderPath, fileName);
         const int maxDepth = 20;
 
-        // Materials
-        RoughMaterial materialGround = new(ColorHelper.FromRGBAF(0.8f, 0.8f, 0f));
-        RoughMaterial materialCenter = new(ColorHelper.FromRGBAF(0.7f, 0.3f, 0.3f));
-        MetalMaterial materialLeft = new(ColorHelper.FromRGBAF(0.8f, 0.8f, 0.8f));
-        MetalMaterial materialRight = new(ColorHelper.FromRGBAF(0.8f, 0.6f, 0.2f));
-
-        // World
         HittableGroup world = new();
-        world.HittableList.Add(new Sphere(materialGround, new Vector3(0f, -100.5f, -1f), 100f));
-        world.HittableList.Add(new Sphere(materialCenter, new Vector3(0f, 0f, -1f), 0.5f));
-        world.HittableList.Add(new Sphere(materialLeft, new Vector3(-1f, 0f, -1f), 0.5f));
-        world.HittableList.Add(new Sphere(materialRight, new Vector3(1f, 0f, -1f), 0.5f));
 
-        // Camera
-        Camera camera = new(800, 600, 1f, new Vector3(0f, 0f, 0f));
-
-        // Render
-        PNGRenderer png = new(camera.Width, camera.Height);
-
-        // MT with each scanline
-        List<Task> scanlineTasks = new();
-        for (int y = 0; y < camera.Height; y++)
+        // Ground
+        RoughMaterial groundMaterial = new(ColorHelper.FromRGBAF(0.5f, 0.5f, 0.5f));
+        world.HittableList.Add(new Sphere(groundMaterial, new Vector3(0f, -1000f, 0f), 1000f));
+        // Random small spheres
+        Random rng = new();
+        for (int i = -11; i < 11; i++)
+        for (int j = -11; j < 11; j++)
         {
-            int Y = y;
-            scanlineTasks.Add(Task.Run(() => CalculateScanline(new Random(), Y, camera, world, maxDepth, png)));
+            float materialProbability = rng.NextSingle();
+            Vector3 center = new(i + 0.9f * rng.NextSingle(), 0.2f, j + 0.9f * rng.NextSingle());
+            if ((center - new Vector3(4f, 0.2f, 0f)).LengthSquared() > 0.9f * 0.9f)
+            {
+                IMaterial material;
+                Color albedo = ColorHelper.FromRandom(rng);
+                if (materialProbability < 0.9f)
+                {
+                    material = new RoughMaterial(albedo);
+                }
+                else if (materialProbability < 0.95f)
+                {
+                    float fuzz = rng.NextSingle() * 0.5f;
+                    material = new MetalMaterial(albedo, fuzz);
+                }
+                else
+                {
+                    material = new DielectricMaterial(Color.White, 1.5f);
+                }
+
+                world.HittableList.Add(new Sphere(material, center, 0.2f));
+            }
         }
 
-        await Task.WhenAll(scanlineTasks);
+        // Big spheres
+        DielectricMaterial glassMaterial = new(Color.White, 1.5f);
+        RoughMaterial roughMaterial = new(ColorHelper.FromRGBAF(0.4f, 0.2f, 0.1f));
+        MetalMaterial metalMaterial = new(ColorHelper.FromRGBAF(0.7f, 0.6f, 0.5f), 0f);
+        world.HittableList.Add(new Sphere(glassMaterial, new Vector3(0f, 1f, 0f), 1f));
+        world.HittableList.Add(new Sphere(roughMaterial, new Vector3(-4f, 1f, 0f), 1f));
+        world.HittableList.Add(new Sphere(metalMaterial, new Vector3(4f, 1f, 0f), 1f));
 
-        ConsoleLogger.Get().LogInfo("Done");
-        png.WriteToFile(fullPath);
-        ProcessStartInfo info = new(fullPath) {UseShellExecute = true};
+        // Camera
+        Vector3 lookFrom = new(13f, 2f, 3f);
+        Vector3 lookAt = new(0f, 0f, 0f);
+        float fov = 20f;
+        float distToFocus = 10f;
+        float aperture = 0.02f;
+        Camera camera = new(1920, 1080, lookFrom, lookAt, fov, aperture, distToFocus);
+
+        // Render
+        RgbImage img = new(camera.Width, camera.Height);
+
+        // Spawn tasks with N scanlines
+        int scanlinesLeft = camera.Height;
+        int numThreads = 16 + 4;
+        int scanlinesPerTask = camera.Height / numThreads;
+        int leftoverScanlines = camera.Height % numThreads;
+        List<Task> scanlineTasks = new();
+        for (int y = 0; y < camera.Height - leftoverScanlines; y += scanlinesPerTask)
+        {
+            int threadLocalY = y;
+            scanlineTasks.Add(Task.Run(() =>
+            {
+                Random localRng = new Random();
+                for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
+                {
+                    CalculateScanline(localRng, scanline, camera, world, maxDepth, img, ref scanlinesLeft);
+                }
+            }));
+        }
+
+        int threadLocalLeftoverScanlines = leftoverScanlines;
+        scanlineTasks.Add(Task.Run(() =>
+        {
+            Random localRng = new Random();
+            for (int scanline = camera.Height - threadLocalLeftoverScanlines; scanline < camera.Height; scanline++)
+            {
+                CalculateScanline(localRng, scanline, camera, world, maxDepth, img, ref scanlinesLeft);
+            }
+        }));
+
+        // Execute
+        ConsoleLogger.Get().LogInfo("Start pathtracing");
+        await Task.WhenAll(scanlineTasks);
+        ConsoleLogger.Get().LogInfo("Done pathtracing");
+
+        ConsoleLogger.Get().LogInfo("Start denoising");
+        RgbImage image;
+        using (Denoiser denoiser = new())
+        {
+            image = denoiser.Denoise(img);
+        }
+
+        ConsoleLogger.Get().LogInfo("Done denoising");
+
+        ConsoleLogger.Get().LogInfo("Start postprocessing");
+        image.Scale(0.8f);
+        ConsoleLogger.Get().LogInfo("Done postprocessing");
+
+        ConsoleLogger.Get().LogInfo("Start writing to disk");
+        image.WriteToFile(fullPath);
+        ConsoleLogger.Get().LogInfo("Done writing to disk");
+
+        ConsoleLogger.Get().LogInfo("Opening");
+        ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
         Process.Start(info);
+        ConsoleLogger.Get().LogInfo("Done");
     }
 
-    private static void CalculateScanline(Random rng, int y, Camera camera, HittableGroup world, int maxDepth,
-        IRenderer renderer)
+    private static void CalculateScanline(
+        Random rng,
+        int y,
+        Camera camera,
+        HittableGroup world,
+        int maxDepth,
+        RgbImage renderer,
+        ref int scanlineCount)
     {
         for (int x = 0; x < camera.Width; x++)
         {
@@ -63,14 +145,14 @@ internal class Program
             {
                 float u = (x + rng.NextSingle()) / camera.Width;
                 float v = (y + rng.NextSingle()) / camera.Height;
-                Ray ray = camera.GetRay(u, v);
+                Ray ray = camera.GetRay(rng, u, v);
                 colorVec += RayColor(ray, world, maxDepth);
             }
 
-            renderer.SetPixel(x, y, ColorHelper.WriteColor(colorVec).ToColor());
+            renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec));
         }
 
-        ConsoleLogger.Get().LogInfo($"Scanlines remaining: {camera.Height - y}");
+        ConsoleLogger.Get().LogInfo($"Scanlines remaining: {scanlineCount--}");
     }
 
     private static Vector3 RayColor(Ray ray, HittableGroup world, int stackDepth)

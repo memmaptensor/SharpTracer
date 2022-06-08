@@ -11,29 +11,47 @@ public class ConsoleLogger : ILogger
 
     public void LogDebug(string message)
     {
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        lock (_logger)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        }
     }
 
     public void LogInfo(string message)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        lock (_logger)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        }
     }
 
     public void LogWarning(string message)
     {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        lock (_logger)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        }
     }
 
     public void LogError(string message)
     {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        lock (_logger)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+        }
     }
 
     public static ConsoleLogger Get() => _logger;
 
-    public void ResetColor() => Console.ForegroundColor = _defaultColor;
+    public void ResetColor()
+    {
+        lock (_logger)
+        {
+            Console.ForegroundColor = _defaultColor;
+        }
+    }
 }

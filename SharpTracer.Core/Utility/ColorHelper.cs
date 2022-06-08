@@ -26,6 +26,8 @@ public static class ColorHelper
         return new Vector3(r, g, b);
     }
 
+    public static Color FromRandom(Random rng) => FromRGBAF(rng.NextSingle(), rng.NextSingle(), rng.NextSingle());
+
     public static Color FromRGBAF(float r, float g, float b, float a = 1.0f) =>
         Color.FromArgb((byte)(a * 255f), (byte)(r * 255f), (byte)(g * 255f), (byte)(b * 255f));
 }
