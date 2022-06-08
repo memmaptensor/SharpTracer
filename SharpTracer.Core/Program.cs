@@ -71,6 +71,7 @@ internal class Program
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
+        const float gamma = 1.2f;
 
         // Spawn tasks with N scanlines
         int scanlinesLeft = camera.Height;
@@ -86,7 +87,7 @@ internal class Program
                 Random localRng = new Random();
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
-                    CalculateScanline(localRng, scanline, camera, world, maxDepth, img, ref scanlinesLeft);
+                    CalculateScanline(localRng, scanline, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
                 }
             }));
         }
@@ -97,7 +98,7 @@ internal class Program
             Random localRng = new Random();
             for (int scanline = camera.Height - threadLocalLeftoverScanlines; scanline < camera.Height; scanline++)
             {
-                CalculateScanline(localRng, scanline, camera, world, maxDepth, img, ref scanlinesLeft);
+                CalculateScanline(localRng, scanline, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
             }
         }));
 
@@ -114,10 +115,6 @@ internal class Program
         }
 
         ConsoleLogger.Get().LogInfo("Done denoising");
-
-        ConsoleLogger.Get().LogInfo("Start postprocessing");
-        image.Scale(0.8f);
-        ConsoleLogger.Get().LogInfo("Done postprocessing");
 
         ConsoleLogger.Get().LogInfo("Start writing to disk");
         image.WriteToFile(fullPath);
@@ -136,6 +133,7 @@ internal class Program
         HittableGroup world,
         int maxDepth,
         RgbImage renderer,
+        float gamma,
         ref int scanlineCount)
     {
         for (int x = 0; x < camera.Width; x++)
@@ -149,7 +147,7 @@ internal class Program
                 colorVec += RayColor(ray, world, maxDepth);
             }
 
-            renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec));
+            renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec, gamma));
         }
 
         ConsoleLogger.Get().LogInfo($"Scanlines remaining: {scanlineCount--}");

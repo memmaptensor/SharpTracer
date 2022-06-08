@@ -12,16 +12,16 @@ public static class ColorHelper
     public static Color ToColor(this Vector3 vec) =>
         Color.FromArgb((byte)(vec.X * 255f), (byte)(vec.Y * 255f), (byte)(vec.Z * 255f));
 
-    public static Vector3 WriteColor(Vector3 vecColor)
+    public static Vector3 WriteColor(Vector3 vecColor, float gamma)
     {
         float r = vecColor.X;
         float g = vecColor.Y;
         float b = vecColor.Z;
 
         float scale = 1f / SamplesPerPixel;
-        r = Math.Clamp(MathF.Sqrt(scale * r), 0f, 1f);
-        g = Math.Clamp(MathF.Sqrt(scale * g), 0f, 1f);
-        b = Math.Clamp(MathF.Sqrt(scale * b), 0f, 1f);
+        r = Math.Clamp(MathF.Pow(scale * r, 1f / gamma), 0f, 1f);
+        g = Math.Clamp(MathF.Pow(scale * g, 1f / gamma), 0f, 1f);
+        b = Math.Clamp(MathF.Pow(scale * b, 1f / gamma), 0f, 1f);
 
         return new Vector3(r, g, b);
     }
