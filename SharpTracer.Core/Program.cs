@@ -1,10 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Numerics;
+using System.Text.Json;
 using SharpTracer.Core.Geometry;
 using SharpTracer.Core.Logging;
 using SharpTracer.Core.Material;
 using SharpTracer.Core.Renderer;
+using SharpTracer.Core.Settings;
 using SharpTracer.Core.Utility;
 using SimpleImageIO;
 
@@ -14,9 +16,25 @@ internal class Program
 {
     private static async Task Main(string[] args)
     {
-        const string folderPath = @"C:\Users\JJ\Videos";
-        const string fileName = "pathtracing.png";
-        string fullPath = Path.Combine(folderPath, fileName);
+        const string pathSettings = "settings.json";
+
+        RenderSettings settings;
+        try
+        {
+            string jsonText = await File.ReadAllTextAsync(pathSettings);
+            settings = JsonSerializer.Deserialize<RenderSettings>(jsonText);
+            if (settings is null)
+            {
+                throw new Exception();
+            }
+        }
+        catch
+        {
+            ConsoleLogger.Get().LogError("Failed to load settings");
+            throw;
+        }
+
+        string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
         const int maxDepth = 20;
 
         HittableGroup world = new();
@@ -75,16 +93,15 @@ internal class Program
 
         // Spawn tasks with N scanlines
         int scanlinesLeft = camera.Height;
-        int numThreads = 16 + 4;
-        int scanlinesPerTask = camera.Height / numThreads;
-        int leftoverScanlines = camera.Height % numThreads;
+        int scanlinesPerTask = camera.Height / settings.NumTasks;
+        int leftoverScanlines = camera.Height % settings.NumTasks;
         List<Task> scanlineTasks = new();
         for (int y = 0; y < camera.Height - leftoverScanlines; y += scanlinesPerTask)
         {
             int threadLocalY = y;
             scanlineTasks.Add(Task.Run(() =>
             {
-                Random localRng = new Random();
+                Random localRng = new();
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
                     CalculateScanline(localRng, scanline, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
@@ -92,15 +109,15 @@ internal class Program
             }));
         }
 
-        int threadLocalLeftoverScanlines = leftoverScanlines;
-        scanlineTasks.Add(Task.Run(() =>
+        for (int y = camera.Height - leftoverScanlines; y < camera.Height; y++)
         {
-            Random localRng = new Random();
-            for (int scanline = camera.Height - threadLocalLeftoverScanlines; scanline < camera.Height; scanline++)
+            int threadLocalY = y;
+            scanlineTasks.Add(Task.Run(() =>
             {
-                CalculateScanline(localRng, scanline, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
-            }
-        }));
+                Random localRng = new();
+                CalculateScanline(localRng, threadLocalY, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
+            }));
+        }
 
         // Execute
         ConsoleLogger.Get().LogInfo("Start pathtracing");

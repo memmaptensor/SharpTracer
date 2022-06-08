@@ -15,4 +15,10 @@
     <PackageReference Include="SimpleImageIO" Version="0.13.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
