@@ -6,43 +6,44 @@ public class HittableGroup : IHittable
 
     public List<IHittable> HittableList { get; }
 
-    public HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
+    public bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
-        HitRecord? hitRecord = null;
+        HitRecord tempHit = new();
+        bool hitAnything = false;
         float closestSoFar = tMax;
 
         foreach (IHittable hittable in HittableList)
         {
-            HitRecord? hit = hittable.HitIfExists(ray, tMin, closestSoFar);
-            if (hit != null)
+            if (hittable.Hit(ray, tMin, closestSoFar, ref tempHit))
             {
-                closestSoFar = (float)hit.Value.T;
-                hitRecord = hit.Value;
+                hitAnything = true;
+                closestSoFar = tempHit.T;
+                hit = tempHit;
             }
         }
 
-        return hitRecord;
+        return hitAnything;
     }
 
-    public AxisAlignedBoundingBox BoundingBox(float time0, float time1)
+    public AABB BoundingBox(float time0, float time1)
     {
         if (HittableList.Count <= 0)
         {
             return null;
         }
 
-        AxisAlignedBoundingBox outputBox = null;
+        AABB outputBox = null;
         bool firstBox = true;
 
         foreach (IHittable obj in HittableList)
         {
-            AxisAlignedBoundingBox tempBox = obj.BoundingBox(time0, time1);
+            AABB tempBox = obj.BoundingBox(time0, time1);
             if (tempBox is null)
             {
                 return null;
             }
 
-            outputBox = firstBox ? tempBox : AxisAlignedBoundingBox.SurroundingBox(outputBox, tempBox);
+            outputBox = firstBox ? tempBox : AABB.SurroundingBox(outputBox, tempBox);
             firstBox = false;
         }
 

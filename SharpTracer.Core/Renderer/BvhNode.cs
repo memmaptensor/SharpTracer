@@ -1,4 +1,4 @@
-﻿using SharpTracer.Core.Logging;
+using SharpTracer.Core.Logging;
 
 namespace SharpTracer.Core.Renderer;
 
@@ -11,8 +11,6 @@ public class BvhNode : IHittable
 
     public BvhNode(List<IHittable> src, int start, int end, float time0, float time1)
     {
-        List<IHittable> objects = new(src);
-
         int axis = new Random().Next(0, 3);
         BoxCompare comparator =
             axis == 0 ? new BoxCompare(0) :
@@ -22,31 +20,31 @@ public class BvhNode : IHittable
 
         if (objectSpan == 1)
         {
-            Left = Right = objects[start];
+            Left = Right = src[start];
         }
         else if (objectSpan == 2)
         {
-            if (comparator.Compare(objects[start], objects[start + 1]) < 0)
+            if (comparator.Compare(src[start], src[start + 1]) <= 0)
             {
-                Left = objects[start];
-                Right = objects[start + 1];
+                Left = src[start];
+                Right = src[start + 1];
             }
             else
             {
-                Left = objects[start + 1];
-                Right = objects[start];
+                Left = src[start + 1];
+                Right = src[start];
             }
         }
         else
         {
-            objects.Sort(start, end - start, comparator);
+            src.Sort(start, end - start, comparator);
             int mid = start + objectSpan / 2;
-            Left = new BvhNode(objects, start, mid, time0, time1);
-            Right = new BvhNode(objects, mid, end, time0, time1);
+            Left = new BvhNode(src, start, mid, time0, time1);
+            Right = new BvhNode(src, mid, end, time0, time1);
         }
 
-        AxisAlignedBoundingBox boxLeft = Left.BoundingBox(time0, time1);
-        AxisAlignedBoundingBox boxRight = Right.BoundingBox(time0, time1);
+        AABB boxLeft = Left.BoundingBox(time0, time1);
+        AABB boxRight = Right.BoundingBox(time0, time1);
 
         if (boxLeft is null || boxRight is null)
         {
@@ -54,22 +52,25 @@ public class BvhNode : IHittable
             throw new Exception();
         }
 
-        Box = AxisAlignedBoundingBox.SurroundingBox(boxLeft, boxRight);
+        Box = AABB.SurroundingBox(boxLeft, boxRight);
     }
 
     public IHittable Left { get; }
     public IHittable Right { get; }
-    public AxisAlignedBoundingBox Box { get; }
+    public AABB Box { get; }
 
-    public HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
+    public bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
         if (!Box.IsHit(ray, tMin, tMax))
         {
-            return null;
+            return false;
         }
 
-        return Left.HitIfExists(ray, tMin, tMax) ?? Right.HitIfExists(ray, tMin, tMax);
+        bool hitLeft = Left.Hit(ray, tMin, tMax, ref hit);
+        bool hitRight = Right.Hit(ray, tMin, hitLeft ? hit.T : tMax, ref hit);
+
+        return hitLeft || hitRight;
     }
 
-    public AxisAlignedBoundingBox BoundingBox(float time0, float time1) => Box;
+    public AABB BoundingBox(float time0, float time1) => Box;
 }

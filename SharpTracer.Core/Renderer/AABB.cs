@@ -2,9 +2,9 @@
 
 namespace SharpTracer.Core.Renderer;
 
-public class AxisAlignedBoundingBox
+public class AABB
 {
-    public AxisAlignedBoundingBox(Vector3 a, Vector3 b)
+    public AABB(Vector3 a, Vector3 b)
     {
         Min = a;
         Max = b;
@@ -68,7 +68,7 @@ public class AxisAlignedBoundingBox
         return true;
     }
 
-    public static AxisAlignedBoundingBox SurroundingBox(AxisAlignedBoundingBox box0, AxisAlignedBoundingBox box1)
+    public static AABB SurroundingBox(AABB box0, AABB box1)
     {
         Vector3 small = new(
             MathF.Min(box0.Min.X, box1.Min.X),
@@ -79,6 +79,6 @@ public class AxisAlignedBoundingBox
             MathF.Max(box0.Max.Y, box1.Max.Y),
             MathF.Max(box0.Max.Z, box1.Max.Z));
 
-        return new AxisAlignedBoundingBox(small, big);
+        return new AABB(small, big);
     }
 }

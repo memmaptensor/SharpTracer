@@ -35,7 +35,7 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 500;
+        const int maxDepth = 20;
 
         HittableGroup world = new();
 
@@ -195,10 +195,10 @@ internal class Program
             return Vector3.Zero;
         }
 
-        HitRecord? hit = world.HitIfExists(ray, 0.001f, float.PositiveInfinity);
-        if (hit != null)
+        HitRecord hit = new();
+        if (world.Hit(ray, 0.001f, float.PositiveInfinity, ref hit))
         {
-            hit.Value.Material.Scatter(ray, hit.Value, out Color attenuation, out Ray outRay);
+            hit.Material.Scatter(ray, hit, out Color attenuation, out Ray outRay);
             return attenuation.ToVector3() * RayColor(outRay, world, stackDepth - 1);
         }
 

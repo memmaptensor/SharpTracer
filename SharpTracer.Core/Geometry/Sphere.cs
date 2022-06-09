@@ -20,7 +20,7 @@ public class Sphere : IHittableMat
 
     public IMaterial Material { get; set; }
 
-    public virtual HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
+    public virtual bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
         Vector3 oc = ray.Origin - Center;
         float a = ray.Direction.LengthSquared();
@@ -30,7 +30,7 @@ public class Sphere : IHittableMat
 
         if (discriminant < 0f)
         {
-            return null;
+            return false;
         }
 
         float sqrtD = MathF.Sqrt(discriminant);
@@ -41,23 +41,23 @@ public class Sphere : IHittableMat
             root = (-halfB + sqrtD) / a;
             if (root < tMin || tMax < root)
             {
-                return null;
+                return false;
             }
         }
 
-        HitRecord hitRecord = new();
-        hitRecord.T = root;
-        hitRecord.Position = ray.At(root);
-        Vector3 outwardNormal = (hitRecord.Position - Center) / Radius;
-        hitRecord.SetFaceNormal(ray, outwardNormal);
-        hitRecord.Material = Material;
+        hit = new HitRecord();
+        hit.T = root;
+        hit.Position = ray.At(root);
+        Vector3 outwardNormal = (hit.Position - Center) / Radius;
+        hit.SetFaceNormal(ray, outwardNormal);
+        hit.Material = Material;
 
-        return hitRecord;
+        return true;
     }
 
-    public virtual AxisAlignedBoundingBox BoundingBox(float time0, float time1)
+    public virtual AABB BoundingBox(float time0, float time1)
     {
-        AxisAlignedBoundingBox aabb = new(
+        AABB aabb = new(
             Center - new Vector3(Radius, Radius, Radius),
             Center + new Vector3(Radius, Radius, Radius));
         return aabb;

@@ -20,23 +20,23 @@ public class MovingSphere : Sphere
     public override Vector3 Center =>
         _t0.Center + (Time - _t0.Time) / (_t1.Time - _t0.Time) * (_t1.Center - _t0.Center);
 
-    public override AxisAlignedBoundingBox BoundingBox(float time0, float time1)
+    public override AABB BoundingBox(float time0, float time1)
     {
         Time = time0;
-        AxisAlignedBoundingBox box0 = new(
+        AABB box0 = new(
             Center - new Vector3(Radius, Radius, Radius),
             Center + new Vector3(Radius, Radius, Radius));
         Time = time1;
-        AxisAlignedBoundingBox box1 = new(
+        AABB box1 = new(
             Center - new Vector3(Radius, Radius, Radius),
             Center + new Vector3(Radius, Radius, Radius));
 
-        return AxisAlignedBoundingBox.SurroundingBox(box0, box1);
+        return AABB.SurroundingBox(box0, box1);
     }
 
-    public override HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
+    public override bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
         Time = ray.Time;
-        return base.HitIfExists(ray, tMin, tMax);
+        return base.Hit(ray, tMin, tMax, ref hit);
     }
 }

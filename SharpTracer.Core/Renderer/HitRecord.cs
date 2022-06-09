@@ -8,10 +8,10 @@ public struct HitRecord
     public IMaterial Material;
     public Vector3 Position;
     public Vector3 Normals;
-    public double T;
+    public float T;
     public bool IsFrontFace;
 
-    public HitRecord(IMaterial material, Vector3 position, Vector3 normals, double t)
+    public HitRecord(IMaterial material, Vector3 position, Vector3 normals, float t)
     {
         Material = material;
         Position = position;
