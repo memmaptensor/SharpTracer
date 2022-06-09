@@ -20,7 +20,7 @@ public class RoughMaterial : IMaterial
             scatterDir = hit.Normals;
         }
 
-        outRay = new Ray(hit.Position, scatterDir);
+        outRay = new Ray(hit.Position, scatterDir, ray.Time);
         attenuation = Albedo;
     }
 }

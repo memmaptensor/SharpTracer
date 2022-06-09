@@ -5,14 +5,18 @@ namespace SharpTracer.Core.Renderer;
 
 public class Camera
 {
+    private float _time0, _time1;
     private Vector3 _u, _v, _w;
 
-    public Camera(int width, int height, Vector3 origin, Vector3 lookAt, float fov, float aperture, float focusDistance)
+    public Camera(int width, int height, Vector3 origin, Vector3 lookAt, float fov, float aperture, float focusDistance,
+        float time0, float time1)
     {
         Width = width;
         Height = height;
         Origin = origin;
         AspectRatio = (float)Width / Height;
+        _time0 = time0;
+        _time1 = time1;
 
         float theta = fov.ToRadians();
         float h = MathF.Tan(theta / 2f);
@@ -47,7 +51,8 @@ public class Camera
         Vector3 rd = LensRadius * RandomInUnitDisk(rng);
         Vector3 offset = _u * rd.X + Vertical * rd.Y;
 
-        return new Ray(Origin + offset, LowerLeftCorner + s * Horizontal + t * Vertical - Origin - offset);
+        float randomTime = FloatHelper.Lerp(_time0, _time1, rng.NextSingle());
+        return new Ray(Origin + offset, LowerLeftCorner + s * Horizontal + t * Vertical - Origin - offset, randomTime);
     }
 
     private static Vector3 RandomInUnitDisk(Random rng)

@@ -41,7 +41,7 @@ internal class Program
 
         // Ground
         RoughMaterial groundMaterial = new(ColorHelper.FromRGBAF(0.5f, 0.5f, 0.5f));
-        world.HittableList.Add(new Sphere(groundMaterial, new Vector3(0f, -1000f, 0f), 1000f));
+        world.HittableList.Add(new Sphere(groundMaterial, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
         // Random small spheres
         Random rng = new();
         for (int i = -11; i < 11; i++)
@@ -67,7 +67,13 @@ internal class Program
                     material = new DielectricMaterial(Color.White, 1.5f);
                 }
 
-                world.HittableList.Add(new Sphere(material, center, 0.2f));
+                Vector3 center2 = center + new Vector3(0f, 0.5f * rng.NextSingle(), 0f);
+                world.HittableList.Add(
+                    new MovingSphere(
+                        material,
+                        new Transform(center),
+                        new Transform(center2, 1f),
+                        0.2f));
             }
         }
 
@@ -75,9 +81,9 @@ internal class Program
         DielectricMaterial glassMaterial = new(Color.White, 1.5f);
         RoughMaterial roughMaterial = new(ColorHelper.FromRGBAF(0.4f, 0.2f, 0.1f));
         MetalMaterial metalMaterial = new(ColorHelper.FromRGBAF(0.7f, 0.6f, 0.5f), 0f);
-        world.HittableList.Add(new Sphere(glassMaterial, new Vector3(0f, 1f, 0f), 1f));
-        world.HittableList.Add(new Sphere(roughMaterial, new Vector3(-4f, 1f, 0f), 1f));
-        world.HittableList.Add(new Sphere(metalMaterial, new Vector3(4f, 1f, 0f), 1f));
+        world.HittableList.Add(new Sphere(glassMaterial, new Transform(new Vector3(0f, 1f, 0f)), 1f));
+        world.HittableList.Add(new Sphere(roughMaterial, new Transform(new Vector3(-4f, 1f, 0f)), 1f));
+        world.HittableList.Add(new Sphere(metalMaterial, new Transform(new Vector3(4f, 1f, 0f)), 1f));
 
         // Camera
         Vector3 lookFrom = new(13f, 2f, 3f);
@@ -85,7 +91,7 @@ internal class Program
         float fov = 20f;
         float distToFocus = 10f;
         float aperture = 0.02f;
-        Camera camera = new(1920, 1080, lookFrom, lookAt, fov, aperture, distToFocus);
+        Camera camera = new(1920, 1080, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
@@ -120,22 +126,33 @@ internal class Program
         }
 
         // Execute
+        Stopwatch sw = Stopwatch.StartNew();
         ConsoleLogger.Get().LogInfo("Start pathtracing");
         await Task.WhenAll(scanlineTasks);
         ConsoleLogger.Get().LogInfo("Done pathtracing");
 
-        ConsoleLogger.Get().LogInfo("Start denoising");
         RgbImage image;
-        using (Denoiser denoiser = new())
+        if (settings.Denoise)
         {
-            image = denoiser.Denoise(img);
-        }
+            ConsoleLogger.Get().LogInfo("Start denoising");
+            using (Denoiser denoiser = new())
+            {
+                image = denoiser.Denoise(img);
+            }
 
-        ConsoleLogger.Get().LogInfo("Done denoising");
+            ConsoleLogger.Get().LogInfo("Done denoising");
+        }
+        else
+        {
+            image = img;
+        }
 
         ConsoleLogger.Get().LogInfo("Start writing to disk");
         image.WriteToFile(fullPath);
         ConsoleLogger.Get().LogInfo("Done writing to disk");
+        sw.Stop();
+        ConsoleLogger.Get().LogInfo($"Rendering done, time elapsed: {sw.Elapsed}");
+        sw.Reset();
 
         ConsoleLogger.Get().LogInfo("Opening");
         ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
@@ -147,7 +164,7 @@ internal class Program
         Random rng,
         int y,
         Camera camera,
-        HittableGroup world,
+        IHittable world,
         int maxDepth,
         RgbImage renderer,
         float gamma,
@@ -170,7 +187,7 @@ internal class Program
         ConsoleLogger.Get().LogInfo($"Scanlines remaining: {scanlineCount--}");
     }
 
-    private static Vector3 RayColor(Ray ray, HittableGroup world, int stackDepth)
+    private static Vector3 RayColor(Ray ray, IHittable world, int stackDepth)
     {
         if (stackDepth <= 0)
         {

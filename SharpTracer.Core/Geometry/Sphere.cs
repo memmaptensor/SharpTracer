@@ -4,21 +4,23 @@ using SharpTracer.Core.Renderer;
 
 namespace SharpTracer.Core.Geometry;
 
-public class Sphere : IHittable
+public class Sphere : IHittableMat
 {
-    public Sphere(IMaterial material, Vector3 center, float radius)
+    private Transform _transform;
+
+    public Sphere(IMaterial material, Transform transform, float radius)
     {
         Material = material;
-        Center = center;
+        _transform = transform;
         Radius = radius;
     }
 
-    public Vector3 Center { get; }
+    public virtual Vector3 Center => _transform.Center;
     public float Radius { get; }
 
     public IMaterial Material { get; set; }
 
-    public HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
+    public virtual HitRecord? HitIfExists(Ray ray, float tMin, float tMax)
     {
         Vector3 oc = ray.Origin - Center;
         float a = ray.Direction.LengthSquared();
@@ -51,6 +53,14 @@ public class Sphere : IHittable
         hitRecord.Material = Material;
 
         return hitRecord;
+    }
+
+    public virtual AxisAlignedBoundingBox BoundingBox(float time0, float time1)
+    {
+        AxisAlignedBoundingBox aabb = new(
+            Center - new Vector3(Radius, Radius, Radius),
+            Center + new Vector3(Radius, Radius, Radius));
+        return aabb;
     }
 
     public static Vector3 RandomPointInSphere(Random rng)

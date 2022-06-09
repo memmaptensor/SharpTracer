@@ -34,7 +34,7 @@ public class DielectricMaterial : IMaterial
             rayDir = Refract(dir, hit.Normals, refractionRatio);
         }
 
-        outRay = new Ray(hit.Position, rayDir);
+        outRay = new Ray(hit.Position, rayDir, ray.Time);
     }
 
     private Vector3 Refract(Vector3 uv, Vector3 n, float etaiOverEtat)
