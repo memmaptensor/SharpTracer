@@ -23,7 +23,7 @@ public class ConsoleLogger : ILogger
         lock (_logger)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+            Console.WriteLine($"{DateTime.Now} -> Info: {message}");
         }
     }
 
@@ -32,7 +32,7 @@ public class ConsoleLogger : ILogger
         lock (_logger)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+            Console.WriteLine($"{DateTime.Now} -> Warning: {message}");
         }
     }
 
@@ -41,7 +41,7 @@ public class ConsoleLogger : ILogger
         lock (_logger)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{DateTime.Now} -> Debug: {message}");
+            Console.WriteLine($"{DateTime.Now} -> Error: {message}");
         }
     }
 
