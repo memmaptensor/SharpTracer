@@ -9,7 +9,7 @@ public class BvhNode : IHittable
     {
     }
 
-    public BvhNode(List<IHittable> src, int start, int end, float time0, float time1)
+    public BvhNode(List<IHittable> obj, int start, int end, float time0, float time1)
     {
         int axis = new Random().Next(0, 3);
         BoxCompare comparator =
@@ -20,27 +20,27 @@ public class BvhNode : IHittable
 
         if (objectSpan == 1)
         {
-            Left = Right = src[start];
+            Left = Right = obj[start];
         }
         else if (objectSpan == 2)
         {
-            if (comparator.Compare(src[start], src[start + 1]) <= 0)
+            if (comparator.Compare(obj[start], obj[start + 1]) <= 0)
             {
-                Left = src[start];
-                Right = src[start + 1];
+                Left = obj[start];
+                Right = obj[start + 1];
             }
             else
             {
-                Left = src[start + 1];
-                Right = src[start];
+                Left = obj[start + 1];
+                Right = obj[start];
             }
         }
         else
         {
-            src.Sort(start, end - start, comparator);
+            obj.Sort(start, end - start, comparator);
             int mid = start + objectSpan / 2;
-            Left = new BvhNode(src, start, mid, time0, time1);
-            Right = new BvhNode(src, mid, end, time0, time1);
+            Left = new BvhNode(obj, start, mid, time0, time1);
+            Right = new BvhNode(obj, mid, end, time0, time1);
         }
 
         AABB boxLeft = Left.BoundingBox(time0, time1);

@@ -38,7 +38,6 @@ internal class Program
         const int maxDepth = 20;
 
         HittableGroup world = new();
-
         // Ground
         RoughMaterial groundMaterial = new(ColorHelper.FromRGBAF(0.5f, 0.5f, 0.5f));
         world.HittableList.Add(new Sphere(groundMaterial, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
@@ -69,12 +68,11 @@ internal class Program
 
                 Vector3 center2 = center + new Vector3(0f, 0.5f * rng.NextSingle(), 0f);
                 world.HittableList.Add(
-                    /*new MovingSphere(
+                    new MovingSphere(
                         material,
                         new Transform(center),
                         new Transform(center2, 1f),
-                        0.2f)*/
-                    new Sphere(material, new Transform(center), 0.2f));
+                        0.2f));
             }
         }
 
@@ -85,6 +83,8 @@ internal class Program
         world.HittableList.Add(new Sphere(glassMaterial, new Transform(new Vector3(0f, 1f, 0f)), 1f));
         world.HittableList.Add(new Sphere(roughMaterial, new Transform(new Vector3(-4f, 1f, 0f)), 1f));
         world.HittableList.Add(new Sphere(metalMaterial, new Transform(new Vector3(4f, 1f, 0f)), 1f));
+
+        BvhNode node = new(world, 0f, 1f);
 
         // Camera
         Vector3 lookFrom = new(13f, 2f, 3f);
@@ -111,7 +111,7 @@ internal class Program
                 Random localRng = new();
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
-                    CalculateScanline(localRng, scanline, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
+                    CalculateScanline(localRng, scanline, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
                 }
             }));
         }
@@ -122,7 +122,7 @@ internal class Program
             scanlineTasks.Add(Task.Run(() =>
             {
                 Random localRng = new();
-                CalculateScanline(localRng, threadLocalY, camera, world, maxDepth, img, gamma, ref scanlinesLeft);
+                CalculateScanline(localRng, threadLocalY, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
             }));
         }
 
