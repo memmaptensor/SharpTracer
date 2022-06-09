@@ -9,8 +9,9 @@ public class BvhNode : IHittable
     {
     }
 
-    public BvhNode(List<IHittable> obj, int start, int end, float time0, float time1)
+    public BvhNode(List<IHittable> src, int start, int end, float time0, float time1)
     {
+        List<IHittable> obj = new(src);
         int axis = new Random().Next(0, 3);
         BoxCompare comparator =
             axis == 0 ? new BoxCompare(0) :

@@ -92,7 +92,7 @@ internal class Program
         float fov = 20f;
         float distToFocus = 10f;
         float aperture = 0.02f;
-        Camera camera = new(1920, 1080, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
+        Camera camera = new(800, 600, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
