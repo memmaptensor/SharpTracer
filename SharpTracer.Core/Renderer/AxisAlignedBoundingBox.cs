@@ -21,9 +21,7 @@ public class AxisAlignedBoundingBox
             float t1 = (Max.X - ray.Origin.X) * invD;
             if (invD < 0f)
             {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
+                (t0, t1) = (t1, t0);
             }
 
             tMin = t0 > tMin ? t0 : tMin;
@@ -39,9 +37,7 @@ public class AxisAlignedBoundingBox
             float t1 = (Max.Y - ray.Origin.Y) * invD;
             if (invD < 0f)
             {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
+                (t0, t1) = (t1, t0);
             }
 
             tMin = t0 > tMin ? t0 : tMin;
@@ -57,9 +53,7 @@ public class AxisAlignedBoundingBox
             float t1 = (Max.Z - ray.Origin.Z) * invD;
             if (invD < 0f)
             {
-                float temp = t0;
-                t0 = t1;
-                t1 = temp;
+                (t0, t1) = (t1, t0);
             }
 
             tMin = t0 > tMin ? t0 : tMin;

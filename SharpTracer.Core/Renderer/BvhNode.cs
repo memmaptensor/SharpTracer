@@ -26,7 +26,7 @@ public class BvhNode : IHittable
         }
         else if (objectSpan == 2)
         {
-            if (comparator.Compare(objects[start], objects[start + 1]) == -1)
+            if (comparator.Compare(objects[start], objects[start + 1]) < 0)
             {
                 Left = objects[start];
                 Right = objects[start + 1];
@@ -68,10 +68,7 @@ public class BvhNode : IHittable
             return null;
         }
 
-        HitRecord? hitLeft = Left.HitIfExists(ray, tMin, tMax);
-        HitRecord? hitRight = Right.HitIfExists(ray, tMin, hitLeft is null ? ray.Time : tMax);
-
-        return hitLeft ?? hitRight;
+        return Left.HitIfExists(ray, tMin, tMax) ?? Right.HitIfExists(ray, tMin, tMax);
     }
 
     public AxisAlignedBoundingBox BoundingBox(float time0, float time1) => Box;
