@@ -35,7 +35,7 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 20;
+        const int maxDepth = 500;
 
         HittableGroup world = new();
 
@@ -69,11 +69,12 @@ internal class Program
 
                 Vector3 center2 = center + new Vector3(0f, 0.5f * rng.NextSingle(), 0f);
                 world.HittableList.Add(
-                    new MovingSphere(
+                    /*new MovingSphere(
                         material,
                         new Transform(center),
                         new Transform(center2, 1f),
-                        0.2f));
+                        0.2f)*/
+                    new Sphere(material, new Transform(center), 0.2f));
             }
         }
 
