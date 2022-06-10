@@ -16,14 +16,15 @@ public class PerlinScene : IScene
 
         NoiseData noiseData = new(
             FastNoiseLite.NoiseType.Perlin,
-            69,
-            2f,
+            1337,
+            1f,
             new Vector3(1f, 1f, 1f),
-            new Vector3(0f, 0f, 0f));
+            new Vector3(0f, 0f, 0f),
+            7);
 
         FastNoiseLite noise = new();
-        NoiseTexture noiseTex = new(noise, noiseData, Color.White);
-        TexturedMaterial sphereMat = new(noiseTex);
+        ITexture noiseTex = new MarbleTexture(noise, noiseData, Color.White);
+        IMaterial sphereMat = new TexturedMaterial(noiseTex);
 
         world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
         world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, 2f, 0f)), 2f));

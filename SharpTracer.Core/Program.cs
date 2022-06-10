@@ -44,7 +44,7 @@ internal class Program
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
-        const float gamma = 1.2f;
+        const float gamma = 1f;
 
         // Spawn tasks with N scanlines
         int scanlinesLeft = camera.Height;
@@ -104,7 +104,7 @@ internal class Program
         sw.Reset();
 
         ConsoleLogger.Get().LogInfo("Opening");
-        ProcessStartInfo info = new(fullPath) {UseShellExecute = true};
+        ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
         Process.Start(info);
         ConsoleLogger.Get().LogInfo("Done");
     }
