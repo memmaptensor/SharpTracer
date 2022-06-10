@@ -4,7 +4,7 @@ namespace SharpTracer.Core.Renderer;
 
 public class BoxCompare : IComparer<IHittable>
 {
-    private int _axis;
+    private readonly int _axis;
 
     public BoxCompare(int axis) => _axis = axis;
 

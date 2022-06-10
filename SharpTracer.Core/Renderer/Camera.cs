@@ -5,8 +5,11 @@ namespace SharpTracer.Core.Renderer;
 
 public class Camera
 {
-    private float _time0, _time1;
-    private Vector3 _u, _v, _w;
+    private readonly float _time0;
+    private readonly float _time1;
+    private readonly Vector3 _u;
+    private readonly Vector3 _v;
+    private readonly Vector3 _w;
 
     public Camera(int width, int height, Vector3 origin, Vector3 lookAt, float fov, float aperture, float focusDistance,
         float time0, float time1)

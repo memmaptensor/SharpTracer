@@ -2,10 +2,9 @@
 using System.Drawing;
 using System.Numerics;
 using System.Text.Json;
-using SharpTracer.Core.Geometry;
 using SharpTracer.Core.Logging;
-using SharpTracer.Core.Material;
 using SharpTracer.Core.Renderer;
+using SharpTracer.Core.Scene;
 using SharpTracer.Core.Settings;
 using SharpTracer.Core.Utility;
 using SimpleImageIO;
@@ -37,62 +36,11 @@ internal class Program
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
         const int maxDepth = 20;
 
-        HittableGroup world = new();
-        // Ground
-        RoughMaterial groundMaterial = new(ColorHelper.FromRGBAF(0.5f, 0.5f, 0.5f));
-        world.HittableList.Add(new Sphere(groundMaterial, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
-        // Random small spheres
-        Random rng = new();
-        for (int i = -11; i < 11; i++)
-        for (int j = -11; j < 11; j++)
-        {
-            float materialProbability = rng.NextSingle();
-            Vector3 center = new(i + 0.9f * rng.NextSingle(), 0.2f, j + 0.9f * rng.NextSingle());
-            if ((center - new Vector3(4f, 0.2f, 0f)).LengthSquared() > 0.9f * 0.9f)
-            {
-                IMaterial material;
-                Color albedo = ColorHelper.FromRandom(rng);
-                if (materialProbability < 0.9f)
-                {
-                    material = new RoughMaterial(albedo);
-                }
-                else if (materialProbability < 0.95f)
-                {
-                    float fuzz = rng.NextSingle() * 0.5f;
-                    material = new MetalMaterial(albedo, fuzz);
-                }
-                else
-                {
-                    material = new DielectricMaterial(Color.White, 1.5f);
-                }
+        IScene scene = new PerlinScene();
+        BvhNode node = new(scene.Render(), 0f, 1f);
 
-                Vector3 center2 = center + new Vector3(0f, 0.5f * rng.NextSingle(), 0f);
-                world.HittableList.Add(
-                    new MovingSphere(
-                        material,
-                        new Transform(center),
-                        new Transform(center2, 1f),
-                        0.2f));
-            }
-        }
-
-        // Big spheres
-        DielectricMaterial glassMaterial = new(Color.White, 1.5f);
-        RoughMaterial roughMaterial = new(ColorHelper.FromRGBAF(0.4f, 0.2f, 0.1f));
-        MetalMaterial metalMaterial = new(ColorHelper.FromRGBAF(0.7f, 0.6f, 0.5f), 0f);
-        world.HittableList.Add(new Sphere(glassMaterial, new Transform(new Vector3(0f, 1f, 0f)), 1f));
-        world.HittableList.Add(new Sphere(roughMaterial, new Transform(new Vector3(-4f, 1f, 0f)), 1f));
-        world.HittableList.Add(new Sphere(metalMaterial, new Transform(new Vector3(4f, 1f, 0f)), 1f));
-
-        BvhNode node = new(world, 0f, 1f);
-
-        // Camera
-        Vector3 lookFrom = new(13f, 2f, 3f);
-        Vector3 lookAt = new(0f, 0f, 0f);
-        float fov = 20f;
-        float distToFocus = 10f;
-        float aperture = 0.02f;
-        Camera camera = new(800, 600, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
+        IEyeView eye = new LevelCamera();
+        Camera camera = eye.GetCamera();
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
@@ -156,7 +104,7 @@ internal class Program
         sw.Reset();
 
         ConsoleLogger.Get().LogInfo("Opening");
-        ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
+        ProcessStartInfo info = new(fullPath) {UseShellExecute = true};
         Process.Start(info);
         ConsoleLogger.Get().LogInfo("Done");
     }

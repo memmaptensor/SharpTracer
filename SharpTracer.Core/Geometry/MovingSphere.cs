@@ -6,7 +6,8 @@ namespace SharpTracer.Core.Geometry;
 
 public class MovingSphere : Sphere
 {
-    private Transform _t0, _t1;
+    private readonly Transform _t0;
+    private readonly Transform _t1;
 
     public MovingSphere(IMaterial material, Transform t0, Transform t1, float radius) : base(material,
         t0, radius)

@@ -4,9 +4,9 @@ using SharpTracer.Core.Renderer;
 
 namespace SharpTracer.Core.Geometry;
 
-public class Sphere : IHittableMat
+public class Sphere : IHittableMat, IUVMap
 {
-    private Transform _transform;
+    private readonly Transform _transform;
 
     public Sphere(IMaterial material, Transform transform, float radius)
     {
@@ -50,6 +50,7 @@ public class Sphere : IHittableMat
         hit.Position = ray.At(root);
         Vector3 outwardNormal = (hit.Position - Center) / Radius;
         hit.SetFaceNormal(ray, outwardNormal);
+        hit.UV = GetUV(outwardNormal);
         hit.Material = Material;
 
         return true;
@@ -61,6 +62,17 @@ public class Sphere : IHittableMat
             Center - new Vector3(Radius, Radius, Radius),
             Center + new Vector3(Radius, Radius, Radius));
         return aabb;
+    }
+
+    public Vector2 GetUV(Vector3 p)
+    {
+        float theta = MathF.Acos(-p.Y);
+        float phi = MathF.Atan2(-p.Z, p.X) + MathF.PI;
+
+        float u = phi / (2f * MathF.PI);
+        float v = theta / MathF.PI;
+
+        return new Vector2(u, v);
     }
 
     public static Vector3 RandomPointInSphere(Random rng)

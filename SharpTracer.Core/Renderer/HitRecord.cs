@@ -9,15 +9,17 @@ public struct HitRecord
     public Vector3 Position;
     public Vector3 Normals;
     public float T;
+    public Vector2 UV;
     public bool IsFrontFace;
 
-    public HitRecord(IMaterial material, Vector3 position, Vector3 normals, float t)
+    public HitRecord(IMaterial material, Vector3 position, Vector3 normals, float t, Vector2 uv)
     {
         Material = material;
         Position = position;
         Normals = normals;
         T = t;
         IsFrontFace = false;
+        UV = uv;
     }
 
     public void SetFaceNormal(Ray ray, Vector3 outwardNormal)
