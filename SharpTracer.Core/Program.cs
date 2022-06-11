@@ -35,7 +35,7 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 50;
+        const int maxDepth = 20;
 
         IScene scene = new CornellBoxScene();
         // HittableGroup world = scene.Render();
@@ -45,8 +45,8 @@ internal class Program
         Camera camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background, but eh
-        // ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
-        ICameraBackground background = new SolidBackground(Color.Black);
+        ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
+        // ICameraBackground background = new SolidBackground(Color.Black);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);

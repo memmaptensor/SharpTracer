@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SharpTracer.Core.Logging;
 
 namespace SharpTracer.Core.Renderer;
 
@@ -57,6 +58,7 @@ public class HitTransformer : IHittable
         }
 
         AABB boundingBox = new(min, max);
+        ConsoleLogger.Get().LogDebug($"{min}, {max}");
         return boundingBox;
     }
 }
