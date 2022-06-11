@@ -38,7 +38,7 @@ public class DielectricMaterial : IMaterial
         return true;
     }
 
-    private Vector3 Refract(Vector3 uv, Vector3 n, float etaiOverEtat)
+    private static Vector3 Refract(Vector3 uv, Vector3 n, float etaiOverEtat)
     {
         float cosTheta = MathF.Min(Vector3.Dot(-uv, n), 1f);
         Vector3 rayOutPerpendicular = etaiOverEtat * (uv + cosTheta * n);
@@ -46,7 +46,7 @@ public class DielectricMaterial : IMaterial
         return rayOutPerpendicular + rayOutParallel;
     }
 
-    private float Reflectance(float cosine, float refractionRatio)
+    private static float Reflectance(float cosine, float refractionRatio)
     {
         // Schlick's approximation
         float r0 = (1 - refractionRatio) / (1 + refractionRatio);

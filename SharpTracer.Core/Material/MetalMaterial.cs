@@ -20,13 +20,13 @@ public class MetalMaterial : IMaterial
     {
         Vector3 reflected = Vector3.Reflect(Vector3.Normalize(ray.Direction), hit.Normals);
         outRay = new Ray(hit.Position, reflected + Fuzziness * Sphere.RandomPointInSphere(new Random()), ray.Time);
+        attenuation = Albedo;
+
         if (Vector3.Dot(outRay.Direction, hit.Normals) <= 0)
         {
-            attenuation = default;
             return false;
         }
 
-        attenuation = Albedo;
         return true;
     }
 }

@@ -26,8 +26,8 @@ public class PerlinScene : IScene
         MarbleTexture noiseTex = new(noise, noiseData, Color.White);
         TexturedMaterial sphereMat = new(noiseTex);
 
-        world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
-        world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, 2f, 0f)), 2f));
+        world.HittableList.Add(new Sphere(sphereMat, new GeometricTransform(new Vector3(0f, -1000f, 0f)), 1000f));
+        world.HittableList.Add(new Sphere(sphereMat, new GeometricTransform(new Vector3(0f, 2f, 0f)), 2f));
 
         return world;
     }

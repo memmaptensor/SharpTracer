@@ -14,7 +14,7 @@ public class EarthScene : IScene
         ImageTexture earthTex = new("earthmap.jpg");
         TexturedMaterial earthMat = new(earthTex);
 
-        world.HittableList.Add(new Sphere(earthMat, new Transform(new Vector3(0f, 0f, 0f)), 2f));
+        world.HittableList.Add(new Sphere(earthMat, new GeometricTransform(new Vector3(0f, 0f, 0f)), 2f));
 
         return world;
     }

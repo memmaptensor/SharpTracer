@@ -5,7 +5,7 @@ namespace SharpTracer.Core.Utility;
 
 public static class ColorHelper
 {
-    public const int SamplesPerPixel = 50;
+    public const int SamplesPerPixel = 200;
 
     public static Vector3 ToVector3(this Color color) => new(color.R / 255f, color.G / 255f, color.B / 255f);
 

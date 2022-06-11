@@ -6,12 +6,12 @@ namespace SharpTracer.Core.Geometry;
 
 public class Sphere : IHittableMat, IUVMap
 {
-    private readonly Transform _transform;
+    private readonly GeometricTransform _transform;
 
-    public Sphere(IMaterial material, Transform transform, float radius)
+    public Sphere(IMaterial material, GeometricTransform GeometricTransform, float radius)
     {
         Material = material;
-        _transform = transform;
+        _transform = GeometricTransform;
         Radius = radius;
     }
 

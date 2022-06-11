@@ -18,8 +18,8 @@ public class CheckerScene : IScene
         CheckerboardTexture checkerboardTex = new(oddColor, evenColor);
         TexturedMaterial sphereMat = new(checkerboardTex);
 
-        world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, -10f, 0f)), 10f));
-        world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, 10f, 0f)), 10f));
+        world.HittableList.Add(new Sphere(sphereMat, new GeometricTransform(new Vector3(0f, -10f, 0f)), 10f));
+        world.HittableList.Add(new Sphere(sphereMat, new GeometricTransform(new Vector3(0f, 10f, 0f)), 10f));
 
         return world;
     }

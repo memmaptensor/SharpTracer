@@ -18,7 +18,7 @@ public class SpheresScene : IScene
         Color oddColor = ColorHelper.FromRGBAF(0.9f, 0.9f, 0.9f);
         CheckerboardTexture checkerboardTex = new(oddColor, evenColor);
         TexturedMaterial groundMaterial = new(checkerboardTex);
-        world.HittableList.Add(new Sphere(groundMaterial, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
+        world.HittableList.Add(new Sphere(groundMaterial, new GeometricTransform(new Vector3(0f, -1000f, 0f)), 1000f));
         // Random small spheres
         Random rng = new();
         for (int i = -11; i < 11; i++)
@@ -48,8 +48,8 @@ public class SpheresScene : IScene
                 world.HittableList.Add(
                     new MovingSphere(
                         material,
-                        new Transform(center),
-                        new Transform(center2, 1f),
+                        new GeometricTransform(center),
+                        new GeometricTransform(center2, 1f),
                         0.2f));
             }
         }
@@ -58,9 +58,9 @@ public class SpheresScene : IScene
         DielectricMaterial glassMaterial = new(Color.White, 1.5f);
         RoughMaterial roughMaterial = new(ColorHelper.FromRGBAF(0.4f, 0.2f, 0.1f));
         MetalMaterial metalMaterial = new(ColorHelper.FromRGBAF(0.7f, 0.6f, 0.5f), 0f);
-        world.HittableList.Add(new Sphere(glassMaterial, new Transform(new Vector3(0f, 1f, 0f)), 1f));
-        world.HittableList.Add(new Sphere(roughMaterial, new Transform(new Vector3(-4f, 1f, 0f)), 1f));
-        world.HittableList.Add(new Sphere(metalMaterial, new Transform(new Vector3(4f, 1f, 0f)), 1f));
+        world.HittableList.Add(new Sphere(glassMaterial, new GeometricTransform(new Vector3(0f, 1f, 0f)), 1f));
+        world.HittableList.Add(new Sphere(roughMaterial, new GeometricTransform(new Vector3(-4f, 1f, 0f)), 1f));
+        world.HittableList.Add(new Sphere(metalMaterial, new GeometricTransform(new Vector3(4f, 1f, 0f)), 1f));
 
         return world;
     }

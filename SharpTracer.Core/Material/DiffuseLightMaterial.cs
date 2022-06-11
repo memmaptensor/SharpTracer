@@ -6,11 +6,11 @@ using SharpTracer.Core.Utility;
 
 namespace SharpTracer.Core.Material;
 
-public class DiffuseLight : IMaterial
+public class DiffuseLightMaterial : IMaterial
 {
-    public DiffuseLight(Vector3 albedo) => Albedo = albedo;
+    public DiffuseLightMaterial(Vector3 albedo) => Albedo = albedo;
 
-    public DiffuseLight(Vector3 albedo, ITexture emissionMap)
+    public DiffuseLightMaterial(Vector3 albedo, ITexture emissionMap)
     {
         Albedo = albedo;
         EmissionMap = emissionMap;

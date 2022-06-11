@@ -35,12 +35,13 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 20;
+        const int maxDepth = 50;
 
-        IScene scene = new LightedPerlinScene();
-        BvhNode node = new(scene.Render(), 0f, 1f);
+        IScene scene = new CornellBoxScene();
+        // HittableGroup world = scene.Render();
+        BvhNode world = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new FarCamera();
+        IEyeView eye = new CornellCamera();
         Camera camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background, but eh
@@ -65,7 +66,7 @@ internal class Program
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
                     // ReSharper disable once AccessToDisposedClosure
-                    CalculateScanline(localRng, scanline, camera, background, node, maxDepth, img, gamma,
+                    CalculateScanline(localRng, scanline, camera, background, world, maxDepth, img, gamma,
                         ref scanlinesLeft);
                 }
             }));
@@ -78,7 +79,7 @@ internal class Program
             {
                 Random localRng = new();
                 // ReSharper disable once AccessToDisposedClosure
-                CalculateScanline(localRng, threadLocalY, camera, background, node, maxDepth, img, gamma,
+                CalculateScanline(localRng, threadLocalY, camera, background, world, maxDepth, img, gamma,
                     ref scanlinesLeft);
             }));
         }
@@ -109,7 +110,7 @@ internal class Program
         sw.Reset();
 
         ConsoleLogger.Get().LogInfo("Opening");
-        ProcessStartInfo info = new(fullPath) {UseShellExecute = true};
+        ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
         Process.Start(info);
         ConsoleLogger.Get().LogInfo("Done");
     }
