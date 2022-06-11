@@ -12,7 +12,7 @@ public class RoughMaterial : IMaterial
 
     public Color Albedo { get; }
 
-    public void Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
+    public bool Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
     {
         Vector3 scatterDir = hit.Normals + Vector3.Normalize(Sphere.RandomPointInSphere(new Random()));
         if (scatterDir.IsNearZero())
@@ -22,5 +22,6 @@ public class RoughMaterial : IMaterial
 
         outRay = new Ray(hit.Position, scatterDir, ray.Time);
         attenuation = Albedo;
+        return true;
     }
 }

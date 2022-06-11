@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
+using SharpTracer.Core.Renderer;
 using SharpTracer.Core.Utility;
 
-namespace SharpTracer.Core.Renderer;
+namespace SharpTracer.Core.SceneCamera;
 
 public class Camera
 {

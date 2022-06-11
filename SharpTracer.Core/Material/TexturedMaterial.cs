@@ -13,7 +13,7 @@ public class TexturedMaterial : ITexturedMaterial
 
     public ITexture Texture { get; set; }
 
-    public void Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
+    public bool Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
     {
         Vector3 scatterDir = hit.Normals + Vector3.Normalize(Sphere.RandomPointInSphere(new Random()));
         if (scatterDir.IsNearZero())
@@ -23,5 +23,7 @@ public class TexturedMaterial : ITexturedMaterial
 
         outRay = new Ray(hit.Position, scatterDir, ray.Time);
         attenuation = Texture.FromUV(hit.UV, hit.Position);
+
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using SharpTracer.Core.Renderer;
+﻿using SharpTracer.Core.SceneCamera;
 
 namespace SharpTracer.Core.Scene;
 

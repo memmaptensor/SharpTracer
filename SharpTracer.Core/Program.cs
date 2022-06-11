@@ -5,6 +5,7 @@ using System.Text.Json;
 using SharpTracer.Core.Logging;
 using SharpTracer.Core.Renderer;
 using SharpTracer.Core.Scene;
+using SharpTracer.Core.SceneCamera;
 using SharpTracer.Core.Settings;
 using SharpTracer.Core.Utility;
 using SimpleImageIO;
@@ -36,14 +37,18 @@ internal class Program
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
         const int maxDepth = 20;
 
-        IScene scene = new EarthScene();
+        IScene scene = new LightedPerlinScene();
         BvhNode node = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new LevelCamera();
+        IEyeView eye = new FarCamera();
         Camera camera = eye.GetCamera();
 
+        // Should really be called scene ambient light and not background, but eh
+        // ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
+        ICameraBackground background = new SolidBackground(Color.Black);
+
         // Render
-        var img = new RgbImage(camera.Width, camera.Height);
+        RgbImage img = new(camera.Width, camera.Height);
         const float gamma = 1.2f;
 
         // Spawn tasks with N scanlines
@@ -60,7 +65,8 @@ internal class Program
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
                     // ReSharper disable once AccessToDisposedClosure
-                    CalculateScanline(localRng, scanline, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
+                    CalculateScanline(localRng, scanline, camera, background, node, maxDepth, img, gamma,
+                        ref scanlinesLeft);
                 }
             }));
         }
@@ -72,7 +78,8 @@ internal class Program
             {
                 Random localRng = new();
                 // ReSharper disable once AccessToDisposedClosure
-                CalculateScanline(localRng, threadLocalY, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
+                CalculateScanline(localRng, threadLocalY, camera, background, node, maxDepth, img, gamma,
+                    ref scanlinesLeft);
             }));
         }
 
@@ -91,8 +98,6 @@ internal class Program
                 image = denoiser.Denoise(img);
             }
 
-            img.Dispose();
-
             ConsoleLogger.Get().LogInfo("Done denoising");
         }
 
@@ -102,10 +107,9 @@ internal class Program
         sw.Stop();
         ConsoleLogger.Get().LogInfo($"Rendering done, time elapsed: {sw.Elapsed}");
         sw.Reset();
-        image.Dispose();
 
         ConsoleLogger.Get().LogInfo("Opening");
-        ProcessStartInfo info = new(fullPath) { UseShellExecute = true };
+        ProcessStartInfo info = new(fullPath) {UseShellExecute = true};
         Process.Start(info);
         ConsoleLogger.Get().LogInfo("Done");
     }
@@ -114,6 +118,7 @@ internal class Program
         Random rng,
         int y,
         Camera camera,
+        ICameraBackground background,
         IHittable world,
         int maxDepth,
         RgbImage renderer,
@@ -128,7 +133,7 @@ internal class Program
                 float u = (x + rng.NextSingle()) / camera.Width;
                 float v = (y + rng.NextSingle()) / camera.Height;
                 Ray ray = camera.GetRay(rng, u, v);
-                colorVec += RayColor(ray, world, maxDepth);
+                colorVec += RayColor(ray, world, maxDepth, background);
             }
 
             renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec, gamma));
@@ -137,24 +142,26 @@ internal class Program
         ConsoleLogger.Get().LogInfo($"Scanlines remaining: {scanlineCount--}");
     }
 
-    private static Vector3 RayColor(Ray ray, IHittable world, int stackDepth)
+    private static Vector3 RayColor(Ray ray, IHittable world, int stackDepth, ICameraBackground background)
     {
         if (stackDepth <= 0)
         {
             return Vector3.Zero;
         }
 
-        HitRecord hit = new();
+        HitRecord hit = default;
+
         if (world.Hit(ray, 0.001f, float.PositiveInfinity, ref hit))
         {
-            hit.Material.Scatter(ray, hit, out Color attenuation, out Ray outRay);
-            return attenuation.ToVector3() * RayColor(outRay, world, stackDepth - 1);
+            Vector3 emitted = hit.Material.Emitted(hit.UV, hit.Position);
+            if (hit.Material.Scatter(ray, hit, out Color attenuation, out Ray scattered))
+            {
+                return emitted + attenuation.ToVector3() * RayColor(scattered, world, stackDepth - 1, background);
+            }
+
+            return emitted;
         }
 
-        Color topColor = Color.LightSkyBlue;
-        Color bottomColor = Color.White;
-        Vector3 dir = Vector3.Normalize(ray.Direction);
-        float t = 0.5f * (dir.Y + 1f);
-        return (1f - t) * bottomColor.ToVector3() + t * topColor.ToVector3();
+        return background.GetScreenSpaceColor(ray);
     }
 }

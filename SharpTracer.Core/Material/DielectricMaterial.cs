@@ -15,7 +15,7 @@ public class DielectricMaterial : IMaterial
     public Color Albedo { get; }
     public float IOR { get; }
 
-    public void Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
+    public bool Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
     {
         attenuation = Albedo;
         float refractionRatio = hit.IsFrontFace ? 1f / IOR : IOR;
@@ -35,6 +35,7 @@ public class DielectricMaterial : IMaterial
         }
 
         outRay = new Ray(hit.Position, rayDir, ray.Time);
+        return true;
     }
 
     private Vector3 Refract(Vector3 uv, Vector3 n, float etaiOverEtat)
