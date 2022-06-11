@@ -36,15 +36,15 @@ internal class Program
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
         const int maxDepth = 20;
 
-        IScene scene = new PerlinScene();
+        IScene scene = new EarthScene();
         BvhNode node = new(scene.Render(), 0f, 1f);
 
         IEyeView eye = new LevelCamera();
         Camera camera = eye.GetCamera();
 
         // Render
-        RgbImage img = new(camera.Width, camera.Height);
-        const float gamma = 1f;
+        var img = new RgbImage(camera.Width, camera.Height);
+        const float gamma = 1.2f;
 
         // Spawn tasks with N scanlines
         int scanlinesLeft = camera.Height;
@@ -59,6 +59,7 @@ internal class Program
                 Random localRng = new();
                 for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
                 {
+                    // ReSharper disable once AccessToDisposedClosure
                     CalculateScanline(localRng, scanline, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
                 }
             }));
@@ -70,6 +71,7 @@ internal class Program
             scanlineTasks.Add(Task.Run(() =>
             {
                 Random localRng = new();
+                // ReSharper disable once AccessToDisposedClosure
                 CalculateScanline(localRng, threadLocalY, camera, node, maxDepth, img, gamma, ref scanlinesLeft);
             }));
         }
@@ -80,7 +82,7 @@ internal class Program
         await Task.WhenAll(scanlineTasks);
         ConsoleLogger.Get().LogInfo("Done pathtracing");
 
-        RgbImage image;
+        RgbImage image = img;
         if (settings.Denoise)
         {
             ConsoleLogger.Get().LogInfo("Start denoising");
@@ -89,11 +91,9 @@ internal class Program
                 image = denoiser.Denoise(img);
             }
 
+            img.Dispose();
+
             ConsoleLogger.Get().LogInfo("Done denoising");
-        }
-        else
-        {
-            image = img;
         }
 
         ConsoleLogger.Get().LogInfo("Start writing to disk");
@@ -102,6 +102,7 @@ internal class Program
         sw.Stop();
         ConsoleLogger.Get().LogInfo($"Rendering done, time elapsed: {sw.Elapsed}");
         sw.Reset();
+        image.Dispose();
 
         ConsoleLogger.Get().LogInfo("Opening");
         ProcessStartInfo info = new(fullPath) { UseShellExecute = true };

@@ -23,8 +23,8 @@ public class PerlinScene : IScene
             7);
 
         FastNoiseLite noise = new();
-        ITexture noiseTex = new MarbleTexture(noise, noiseData, Color.White);
-        IMaterial sphereMat = new TexturedMaterial(noiseTex);
+        MarbleTexture noiseTex = new(noise, noiseData, Color.White);
+        TexturedMaterial sphereMat = new(noiseTex);
 
         world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, -1000f, 0f)), 1000f));
         world.HittableList.Add(new Sphere(sphereMat, new Transform(new Vector3(0f, 2f, 0f)), 2f));
