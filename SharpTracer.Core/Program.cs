@@ -35,7 +35,7 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 30;
+        const int maxDepth = 20;
 
         IScene scene = new CornellBoxScene();
         // HittableGroup world = scene.Render();
