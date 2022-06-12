@@ -35,18 +35,18 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 50;
+        const int maxDepth = 30;
 
-        IScene scene = new SpheresScene();
+        IScene scene = new CornellBoxScene();
         // HittableGroup world = scene.Render();
         BvhNode world = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new LevelCamera();
+        IEyeView eye = new CornellCamera();
         Camera camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background
-        ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
-        // ICameraBackground background = new SolidBackground(Color.Black);
+        // ICameraBackground background = new SolidBackground(Color.LightBlue);
+        ICameraBackground background = new SolidBackground(Color.Black);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
