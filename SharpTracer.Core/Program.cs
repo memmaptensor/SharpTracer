@@ -35,18 +35,18 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 30;
+        const int maxDepth = 50;
 
-        IScene scene = new TheNextWeekScene();
+        IScene scene = new SpheresScene();
         // HittableGroup world = scene.Render();
         BvhNode world = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new TheNextWeekCamera();
+        IEyeView eye = new LevelCamera();
         Camera camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background
-        // ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
-        ICameraBackground background = new SolidBackground(Color.Black);
+        ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
+        // ICameraBackground background = new SolidBackground(Color.Black);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);

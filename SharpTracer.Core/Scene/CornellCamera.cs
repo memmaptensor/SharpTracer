@@ -12,7 +12,7 @@ public class CornellCamera : IEyeView
         float fov = 40f;
         float distToFocus = Vector3.Distance(lookFrom, lookAt);
         float aperture = 0.001f;
-        Camera camera = new(600, 600, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
+        Camera camera = new(800, 800, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
 
         return camera;
     }
