@@ -75,14 +75,14 @@ public class Sphere : IHittableMat, IUVMap
         return new Vector2(u, v);
     }
 
-    public static Vector3 RandomPointInSphere(Random rng)
+    public static Vector3 RandomPointInSphere()
     {
         while (true)
         {
             float x, y, z;
-            x = rng.NextSingle() * 2f - 1f;
-            y = rng.NextSingle() * 2f - 1f;
-            z = rng.NextSingle() * 2f - 1f;
+            x = Random.Shared.NextSingle() * 2f - 1f;
+            y = Random.Shared.NextSingle() * 2f - 1f;
+            z = Random.Shared.NextSingle() * 2f - 1f;
             Vector3 vec = new(x, y, z);
             if (vec.LengthSquared() < 1f)
             {

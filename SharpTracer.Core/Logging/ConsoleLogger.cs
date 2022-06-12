@@ -47,7 +47,7 @@ public class ConsoleLogger : ILogger
 
     public static ConsoleLogger Get() => _logger;
 
-    public void ResetColor()
+    public static void ResetColor()
     {
         lock (_logger)
         {

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using SharpTracer.Core.Geometry;
 using SharpTracer.Core.Geometry.Plane;
 using SharpTracer.Core.Material;
@@ -6,13 +7,13 @@ using SharpTracer.Core.Utility;
 
 namespace SharpTracer.Core.Scene;
 
-public class CornellBoxScene : IScene
+public class CornellBoxWithFogScene : IScene
 {
     public HittableGroup Render()
     {
         HittableGroup world = new();
 
-        DiffuseLightMaterial diffLightMat = new(new Vector3(15f, 15f, 15f));
+        DiffuseLightMaterial diffLightMat = new(new Vector3(7f, 7f, 7f));
         RoughMaterial redMat = new(ColorHelper.FromRGBAF(0.65f, 0.05f, 0.05f));
         RoughMaterial whiteMat = new(ColorHelper.FromRGBAF(0.73f, 0.73f, 0.73f));
         RoughMaterial greenMat = new(ColorHelper.FromRGBAF(0.12f, 0.45f, 0.15f));
@@ -22,7 +23,7 @@ public class CornellBoxScene : IScene
         world.HittableList.Add(new YPlane(whiteMat, new Vector2(0f, 0f), new Vector2(555f, 555f), 0f));
         world.HittableList.Add(new YPlane(whiteMat, new Vector2(0f, 0f), new Vector2(555f, 555f), 555f));
         world.HittableList.Add(new ZPlane(whiteMat, new Vector2(0f, 0f), new Vector2(555f, 555f), 555f));
-        world.HittableList.Add(new YPlane(diffLightMat, new Vector2(213f, 227f), new Vector2(343f, 332f), 554f));
+        world.HittableList.Add(new YPlane(diffLightMat, new Vector2(113f, 127f), new Vector2(443f, 432f), 554f));
 
         Cube cube1 = new(whiteMat, new GeometricTransform(
             new Vector3(165f, 330f, 165f) / 2f,
@@ -30,7 +31,7 @@ public class CornellBoxScene : IScene
         Matrix4x4 cube1Mat = Matrix4x4.CreateRotationY(15f.ToRadians()) *
                              Matrix4x4.CreateTranslation(new Vector3(265f, 0f, 295f));
         HitTransformer transformedCube1 = new(cube1, cube1Mat);
-        world.HittableList.Add(transformedCube1);
+        world.HittableList.Add(new ConstantMedium(transformedCube1, 0.01f, Color.Black));
 
         Cube cube2 = new(whiteMat, new GeometricTransform(
             new Vector3(165f, 165f, 165f) / 2f,
@@ -38,7 +39,7 @@ public class CornellBoxScene : IScene
         Matrix4x4 cube2Mat = Matrix4x4.CreateRotationY(-18f.ToRadians()) *
                              Matrix4x4.CreateTranslation(new Vector3(130f, 0f, 65f));
         HitTransformer transformedCube2 = new(cube2, cube2Mat);
-        world.HittableList.Add(transformedCube2);
+        world.HittableList.Add(new ConstantMedium(transformedCube2, 0.01f, Color.White));
 
         return world;
     }

@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
 using SharpTracer.Core.Logging;
+using SharpTracer.Core.Renderer;
 
-namespace SharpTracer.Core.Renderer;
+namespace SharpTracer.Core.Geometry;
 
 public class HitTransformer : IHittable
 {

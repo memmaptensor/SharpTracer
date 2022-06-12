@@ -2,7 +2,6 @@
 using System.Numerics;
 using SharpTracer.Core.Geometry;
 using SharpTracer.Core.Material;
-using SharpTracer.Core.Renderer;
 using SharpTracer.Core.Texture;
 using SharpTracer.Core.Utility;
 

@@ -1,4 +1,6 @@
-﻿namespace SharpTracer.Core.Renderer;
+﻿using SharpTracer.Core.Renderer;
+
+namespace SharpTracer.Core.Geometry;
 
 public class HittableGroup : IHittable
 {

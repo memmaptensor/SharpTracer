@@ -25,7 +25,7 @@ public class DielectricMaterial : IMaterial
         float sinTheta = MathF.Sqrt(1f - cosTheta * cosTheta);
 
         Vector3 rayDir;
-        if (refractionRatio * sinTheta > 1f || Reflectance(cosTheta, refractionRatio) > new Random().NextSingle())
+        if (refractionRatio * sinTheta > 1f || Reflectance(cosTheta, refractionRatio) > Random.Shared.NextSingle())
         {
             rayDir = Vector3.Reflect(dir, hit.Normals);
         }

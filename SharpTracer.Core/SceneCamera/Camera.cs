@@ -50,21 +50,21 @@ public class Camera
     public float LensRadius { get; }
 
 
-    public Ray GetRay(Random rng, float s, float t)
+    public Ray GetRay(float s, float t)
     {
-        Vector3 rd = LensRadius * RandomInUnitDisk(rng);
+        Vector3 rd = LensRadius * RandomInUnitDisk();
         Vector3 offset = _u * rd.X + Vertical * rd.Y;
 
-        float randomTime = FloatHelper.Lerp(_time0, _time1, rng.NextSingle());
+        float randomTime = FloatHelper.Lerp(_time0, _time1, Random.Shared.NextSingle());
         return new Ray(Origin + offset, LowerLeftCorner + s * Horizontal + t * Vertical - Origin - offset, randomTime);
     }
 
-    private static Vector3 RandomInUnitDisk(Random rng)
+    private static Vector3 RandomInUnitDisk()
     {
         while (true)
         {
-            float a = rng.NextSingle() * 2f - 1f;
-            float b = rng.NextSingle() * 2f - 1f;
+            float a = Random.Shared.NextSingle() * 2f - 1f;
+            float b = Random.Shared.NextSingle() * 2f - 1f;
             Vector3 p = new(a, b, 0f);
             if (p.LengthSquared() < 1f)
             {

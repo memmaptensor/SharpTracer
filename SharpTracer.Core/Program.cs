@@ -35,59 +35,29 @@ internal class Program
         }
 
         string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 20;
+        const int maxDepth = 30;
 
-        IScene scene = new CornellBoxScene();
+        IScene scene = new TheNextWeekScene();
         // HittableGroup world = scene.Render();
         BvhNode world = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new CornellCamera();
+        IEyeView eye = new TheNextWeekCamera();
         Camera camera = eye.GetCamera();
 
-        // Should really be called scene ambient light and not background, but eh
-        ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
-        // ICameraBackground background = new SolidBackground(Color.Black);
+        // Should really be called scene ambient light and not background
+        // ICameraBackground background = new SolidBackground(Color.LightSkyBlue);
+        ICameraBackground background = new SolidBackground(Color.Black);
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
-        const float gamma = 1.2f;
-
-        // Spawn tasks with N scanlines
-        int scanlinesLeft = camera.Height;
-        int scanlinesPerTask = camera.Height / settings.NumTasks;
-        int leftoverScanlines = camera.Height % settings.NumTasks;
-        List<Task> scanlineTasks = new();
-        for (int y = 0; y < camera.Height - leftoverScanlines; y += scanlinesPerTask)
-        {
-            int threadLocalY = y;
-            scanlineTasks.Add(Task.Run(() =>
-            {
-                Random localRng = new();
-                for (int scanline = threadLocalY; scanline < threadLocalY + scanlinesPerTask; scanline++)
-                {
-                    // ReSharper disable once AccessToDisposedClosure
-                    CalculateScanline(localRng, scanline, camera, background, world, maxDepth, img, gamma,
-                        ref scanlinesLeft);
-                }
-            }));
-        }
-
-        for (int y = camera.Height - leftoverScanlines; y < camera.Height; y++)
-        {
-            int threadLocalY = y;
-            scanlineTasks.Add(Task.Run(() =>
-            {
-                Random localRng = new();
-                // ReSharper disable once AccessToDisposedClosure
-                CalculateScanline(localRng, threadLocalY, camera, background, world, maxDepth, img, gamma,
-                    ref scanlinesLeft);
-            }));
-        }
+        const float gamma = 0.8f;
 
         // Execute
         Stopwatch sw = Stopwatch.StartNew();
         ConsoleLogger.Get().LogInfo("Start pathtracing");
-        await Task.WhenAll(scanlineTasks);
+        int scanlinesLeft = camera.Height;
+        Parallel.For(0, camera.Height, new ParallelOptions { MaxDegreeOfParallelism = settings.NumTasks },
+            y => CalculateScanline(y, camera, background, world, maxDepth, img, gamma, ref scanlinesLeft));
         ConsoleLogger.Get().LogInfo("Done pathtracing");
 
         RgbImage image = img;
@@ -116,7 +86,6 @@ internal class Program
     }
 
     private static void CalculateScanline(
-        Random rng,
         int y,
         Camera camera,
         ICameraBackground background,
@@ -131,9 +100,9 @@ internal class Program
             Vector3 colorVec = Vector3.Zero;
             for (int s = 0; s < ColorHelper.SamplesPerPixel; s++)
             {
-                float u = (x + rng.NextSingle()) / camera.Width;
-                float v = (y + rng.NextSingle()) / camera.Height;
-                Ray ray = camera.GetRay(rng, u, v);
+                float u = (x + Random.Shared.NextSingle()) / camera.Width;
+                float v = (y + Random.Shared.NextSingle()) / camera.Height;
+                Ray ray = camera.GetRay(u, v);
                 colorVec += RayColor(ray, world, maxDepth, background);
             }
 
