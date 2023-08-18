@@ -21,7 +21,7 @@ internal class Program
         RenderSettings settings;
         try
         {
-            string jsonText = await File.ReadAllTextAsync(pathSettings);
+            var jsonText = await File.ReadAllTextAsync(pathSettings);
             settings = JsonSerializer.Deserialize<RenderSettings>(jsonText);
             if (settings is null)
             {
@@ -34,15 +34,16 @@ internal class Program
             throw;
         }
 
-        string fullPath = Path.Combine(settings.FolderPath, settings.FileName);
-        const int maxDepth = 20;
+        var fullPath = Path.Combine(settings.FolderPath, settings.FileName);
+
+        RenderOptions options = new() { MaxDepth = 5, SamplesPerPixel = 500, Gamma = /*0.8f*/ 1f };
 
         IScene scene = new CornellBoxScene();
         // HittableGroup world = scene.Render();
         BvhNode world = new(scene.Render(), 0f, 1f);
 
         IEyeView eye = new CornellCamera();
-        Camera camera = eye.GetCamera();
+        var camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background
         // ICameraBackground background = new SolidBackground(Color.LightBlue);
@@ -50,17 +51,18 @@ internal class Program
 
         // Render
         RgbImage img = new(camera.Width, camera.Height);
-        const float gamma = 0.8f;
 
         // Execute
-        Stopwatch sw = Stopwatch.StartNew();
+        var sw = Stopwatch.StartNew();
         ConsoleLogger.Get().LogInfo("Start pathtracing");
-        int scanlinesLeft = camera.Height;
+        var scanlinesLeft = camera.Height;
         Parallel.For(0, camera.Height, new ParallelOptions { MaxDegreeOfParallelism = settings.NumTasks },
-            y => CalculateScanline(y, camera, background, world, maxDepth, img, gamma, ref scanlinesLeft));
+            y => CalculateScanline(y, camera, background, world, options.MaxDepth, img, options.Gamma,
+                ref scanlinesLeft,
+                options.SamplesPerPixel, settings.NumTasks));
         ConsoleLogger.Get().LogInfo("Done pathtracing");
 
-        RgbImage image = img;
+        var image = img;
         if (settings.Denoise)
         {
             ConsoleLogger.Get().LogInfo("Start denoising");
@@ -93,21 +95,24 @@ internal class Program
         int maxDepth,
         RgbImage renderer,
         float gamma,
-        ref int scanlineCount)
+        ref int scanlineCount,
+        float samplesPerPixel,
+        int numTasks)
     {
-        for (int x = 0; x < camera.Width; x++)
-        {
-            Vector3 colorVec = Vector3.Zero;
-            for (int s = 0; s < ColorHelper.SamplesPerPixel; s++)
+        Parallel.For(0, camera.Width, new ParallelOptions { MaxDegreeOfParallelism = numTasks },
+            x =>
             {
-                float u = (x + Random.Shared.NextSingle()) / camera.Width;
-                float v = (y + Random.Shared.NextSingle()) / camera.Height;
-                Ray ray = camera.GetRay(u, v);
-                colorVec += RayColor(ray, world, maxDepth, background);
-            }
+                var colorVec = Vector3.Zero;
+                for (var s = 0; s < samplesPerPixel; s++)
+                {
+                    var u = (x + Random.Shared.NextSingle()) / camera.Width;
+                    var v = (y + Random.Shared.NextSingle()) / camera.Height;
+                    var ray = camera.GetRay(u, v);
+                    colorVec += RayColor(ray, world, maxDepth, background);
+                }
 
-            renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec, gamma));
-        }
+                renderer.SetPixel(x, camera.Height - 1 - y, ColorHelper.WriteColor(colorVec, gamma, samplesPerPixel));
+            });
 
         ConsoleLogger.Get().LogInfo($"Scanlines remaining: {scanlineCount--}");
     }
@@ -123,8 +128,8 @@ internal class Program
 
         if (world.Hit(ray, 0.001f, float.PositiveInfinity, ref hit))
         {
-            Vector3 emitted = hit.Material.Emitted(hit.UV, hit.Position);
-            if (hit.Material.Scatter(ray, hit, out Color attenuation, out Ray scattered))
+            var emitted = hit.Material.Emitted(hit.UV, hit.Position);
+            if (hit.Material.Scatter(ray, hit, out var attenuation, out var scattered))
             {
                 return emitted + attenuation.ToVector3() * RayColor(scattered, world, stackDepth - 1, background);
             }

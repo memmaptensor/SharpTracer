@@ -24,9 +24,9 @@ public class ImageTexture : ITexture, IDisposable
         uv.Y = 1f - uv.Y;
 
         // UV range -> [0, 1]
-        int texX = (int)Remap.Map(uv.X, 0f, 1f, 0, Image.Width - 1);
-        int texY = (int)Remap.Map(uv.Y, 0f, 1f, 0, Image.Height - 1);
-        RgbColor color = Image.GetPixel(texX, texY);
+        var texX = (int)Remap.Map(uv.X, 0f, 1f, 0, Image.Width - 1);
+        var texY = (int)Remap.Map(uv.Y, 0f, 1f, 0, Image.Height - 1);
+        var color = Image.GetPixel(texX, texY);
         return ColorHelper.FromRGBAF(color.R, color.G, color.B);
     }
 }

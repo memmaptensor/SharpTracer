@@ -15,7 +15,7 @@ public class TexturedMaterial : ITexturedMaterial
 
     public bool Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
     {
-        Vector3 scatterDir = hit.Normals + Vector3.Normalize(Sphere.RandomPointInSphere());
+        var scatterDir = hit.Normals + Vector3.Normalize(Sphere.RandomPointInSphere());
         if (scatterDir.IsNearZero())
         {
             scatterDir = hit.Normals;

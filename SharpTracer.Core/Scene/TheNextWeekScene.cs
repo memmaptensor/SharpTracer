@@ -17,16 +17,16 @@ public class TheNextWeekScene : IScene
 
         RoughMaterial groundMat = new(ColorHelper.FromRGBAF(0.48f, 0.83f, 0.53f));
         const int boxesPerSide = 20;
-        for (int i = 0; i < boxesPerSide; i++)
-        for (int j = 0; j < boxesPerSide; j++)
+        for (var i = 0; i < boxesPerSide; i++)
+        for (var j = 0; j < boxesPerSide; j++)
         {
-            float w = 100f;
-            float x0 = -1000f + i * w;
-            float z0 = -1000f + j * w;
-            float y0 = 0f;
-            float x1 = x0 + w;
-            float y1 = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, 1f, 101f);
-            float z1 = z0 + w;
+            var w = 100f;
+            var x0 = -1000f + i * w;
+            var z0 = -1000f + j * w;
+            var y0 = 0f;
+            var x1 = x0 + w;
+            var y1 = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, 1f, 101f);
+            var z1 = z0 + w;
 
             Vector3 closest = new(x0, y0, z0);
             Vector3 farthest = new(x1, y1, z1);
@@ -40,7 +40,7 @@ public class TheNextWeekScene : IScene
         DiffuseLightMaterial lightMat = new(new Vector3(7f, 7f, 7f));
         world.HittableList.Add(new YPlane(lightMat, new Vector2(123f, 147f), new Vector2(423f, 412f), 554f));
         Vector3 center1 = new(400f, 400f, 200f);
-        Vector3 center2 = center1 + new Vector3(30f, 0f, 0f);
+        var center2 = center1 + new Vector3(30f, 0f, 0f);
         RoughMaterial movingSphereMat = new(ColorHelper.FromRGBAF(0.7f, 0.3f, 0.1f));
         world.HittableList.Add(new MovingSphere(movingSphereMat, new GeometricTransform(center1),
             new GeometricTransform(center2, 1f), 50f));
@@ -70,14 +70,14 @@ public class TheNextWeekScene : IScene
 
         HittableGroup sphereBox = new();
         RoughMaterial whiteMat = new(ColorHelper.FromRGBAF(0.73f, 0.73f, 0.73f));
-        for (int i = 0; i < 1000; i++)
+        for (var i = 0; i < 1000; i++)
         {
             sphereBox.HittableList.Add(new Sphere(whiteMat, new GeometricTransform(Cube.RandomPointInCube(0f, 165f)),
                 10f));
         }
 
-        Matrix4x4 sphereBoxTransform = Matrix4x4.CreateRotationY(15f.ToRadians()) *
-                                       Matrix4x4.CreateTranslation(new Vector3(-100f, 270f, 395f));
+        var sphereBoxTransform = Matrix4x4.CreateRotationY(15f.ToRadians()) *
+                                 Matrix4x4.CreateTranslation(new Vector3(-100f, 270f, 395f));
         world.HittableList.Add(new HitTransformer(new BvhNode(sphereBox, 0f, 1f), sphereBoxTransform));
 
         return world;

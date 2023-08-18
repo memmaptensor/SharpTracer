@@ -17,9 +17,9 @@ public class HitTransformer : IHittable
 
     public bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
-        Matrix4x4.Invert(Transform, out Matrix4x4 invertedTransform);
-        Vector3 movedRayOrigin = Vector3.Transform(ray.Origin, invertedTransform);
-        Vector3 movedRayDirection = Vector3.TransformNormal(ray.Direction, invertedTransform);
+        Matrix4x4.Invert(Transform, out var invertedTransform);
+        var movedRayOrigin = Vector3.Transform(ray.Origin, invertedTransform);
+        var movedRayDirection = Vector3.TransformNormal(ray.Direction, invertedTransform);
         Ray movedRay = new(movedRayOrigin, movedRayDirection, ray.Time);
         if (!Original.Hit(movedRay, tMin, tMax, ref hit))
         {
@@ -34,7 +34,7 @@ public class HitTransformer : IHittable
 
     public AABB BoundingBox(float time0, float time1)
     {
-        AABB originalBox = Original.BoundingBox(time0, time1);
+        var originalBox = Original.BoundingBox(time0, time1);
         if (originalBox is null)
         {
             return null;
@@ -52,7 +52,7 @@ public class HitTransformer : IHittable
         };
 
         Vector3 min = transformedPoints[0], max = transformedPoints[0];
-        for (int i = 1; i < transformedPoints.Length; i++)
+        for (var i = 1; i < transformedPoints.Length; i++)
         {
             min = Vector3.Min(min, transformedPoints[i]);
             max = Vector3.Max(max, transformedPoints[i]);

@@ -23,7 +23,7 @@ public class NoiseTexture : ITexture
 
     public Color FromUV(Vector2 uv, Vector3 pt)
     {
-        Vector3 p = new Vector3(
+        var p = new Vector3(
             pt.X * NoiseData.Scale.X,
             pt.Y * NoiseData.Scale.Y,
             pt.Z * NoiseData.Scale.Z) + NoiseData.Offset;

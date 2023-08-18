@@ -67,9 +67,9 @@ public class Cube : IHittableMat
 
     public static Vector3 RandomPointInCube(float min, float max)
     {
-        float x = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
-        float y = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
-        float z = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
+        var x = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
+        var y = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
+        var z = Remap.Map(Random.Shared.NextSingle(), 0f, 1f, min, max);
 
         return new Vector3(x, y, z);
     }

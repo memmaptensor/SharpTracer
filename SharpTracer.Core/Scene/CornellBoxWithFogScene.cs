@@ -28,16 +28,16 @@ public class CornellBoxWithFogScene : IScene
         Cube cube1 = new(whiteMat, new GeometricTransform(
             new Vector3(165f, 330f, 165f) / 2f,
             new Vector3(165f, 330f, 165f)));
-        Matrix4x4 cube1Mat = Matrix4x4.CreateRotationY(15f.ToRadians()) *
-                             Matrix4x4.CreateTranslation(new Vector3(265f, 0f, 295f));
+        var cube1Mat = Matrix4x4.CreateRotationY(15f.ToRadians()) *
+                       Matrix4x4.CreateTranslation(new Vector3(265f, 0f, 295f));
         HitTransformer transformedCube1 = new(cube1, cube1Mat);
         world.HittableList.Add(new ConstantMedium(transformedCube1, 0.01f, Color.Black));
 
         Cube cube2 = new(whiteMat, new GeometricTransform(
             new Vector3(165f, 165f, 165f) / 2f,
             new Vector3(165f, 165f, 165f)));
-        Matrix4x4 cube2Mat = Matrix4x4.CreateRotationY(-18f.ToRadians()) *
-                             Matrix4x4.CreateTranslation(new Vector3(130f, 0f, 65f));
+        var cube2Mat = Matrix4x4.CreateRotationY(-18f.ToRadians()) *
+                       Matrix4x4.CreateTranslation(new Vector3(130f, 0f, 65f));
         HitTransformer transformedCube2 = new(cube2, cube2Mat);
         world.HittableList.Add(new ConstantMedium(transformedCube2, 0.01f, Color.White));
 

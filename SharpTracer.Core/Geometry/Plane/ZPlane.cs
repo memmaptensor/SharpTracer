@@ -23,7 +23,7 @@ public class ZPlane : IHittableMat
 
     public bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
-        SetHitParams(ray, out float t, out Vector3 outwardNormal, out float a, out float b);
+        SetHitParams(ray, out var t, out var outwardNormal, out var a, out var b);
 
         if (t < tMin || t > tMax)
         {

@@ -28,17 +28,17 @@ public class TurbulenceNoiseTexture : ITexture
             pt.X * NoiseData.Scale.X,
             pt.Y * NoiseData.Scale.Y,
             pt.Z * NoiseData.Scale.Z);
-        float turbulence = GetTurbulence(uv, p);
+        var turbulence = GetTurbulence(uv, p);
         return (turbulence * Color.ToVector3()).ToColor();
     }
 
     protected float GetTurbulence(Vector2 uv, Vector3 p)
     {
-        float accum = 0f;
-        float weight = 1f;
-        Vector3 tempP = p;
+        var accum = 0f;
+        var weight = 1f;
+        var tempP = p;
 
-        for (int i = 0; i < NoiseData.Turbulence; i++)
+        for (var i = 0; i < NoiseData.Turbulence; i++)
         {
             accum += weight * Noise.GetNoise(tempP.X, tempP.Y, tempP.Z);
             weight *= 0.5f;

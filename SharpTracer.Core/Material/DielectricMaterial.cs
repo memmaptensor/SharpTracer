@@ -18,11 +18,11 @@ public class DielectricMaterial : IMaterial
     public bool Scatter(Ray ray, HitRecord hit, out Color attenuation, out Ray outRay)
     {
         attenuation = Albedo;
-        float refractionRatio = hit.IsFrontFace ? 1f / IOR : IOR;
-        Vector3 dir = Vector3.Normalize(ray.Direction);
+        var refractionRatio = hit.IsFrontFace ? 1f / IOR : IOR;
+        var dir = Vector3.Normalize(ray.Direction);
 
-        float cosTheta = MathF.Min(Vector3.Dot(-dir, hit.Normals), 1f);
-        float sinTheta = MathF.Sqrt(1f - cosTheta * cosTheta);
+        var cosTheta = MathF.Min(Vector3.Dot(-dir, hit.Normals), 1f);
+        var sinTheta = MathF.Sqrt(1f - cosTheta * cosTheta);
 
         Vector3 rayDir;
         if (refractionRatio * sinTheta > 1f || Reflectance(cosTheta, refractionRatio) > Random.Shared.NextSingle())
@@ -40,16 +40,16 @@ public class DielectricMaterial : IMaterial
 
     private static Vector3 Refract(Vector3 uv, Vector3 n, float etaiOverEtat)
     {
-        float cosTheta = MathF.Min(Vector3.Dot(-uv, n), 1f);
-        Vector3 rayOutPerpendicular = etaiOverEtat * (uv + cosTheta * n);
-        Vector3 rayOutParallel = -MathF.Sqrt(MathF.Abs(1f - rayOutPerpendicular.LengthSquared())) * n;
+        var cosTheta = MathF.Min(Vector3.Dot(-uv, n), 1f);
+        var rayOutPerpendicular = etaiOverEtat * (uv + cosTheta * n);
+        var rayOutParallel = -MathF.Sqrt(MathF.Abs(1f - rayOutPerpendicular.LengthSquared())) * n;
         return rayOutPerpendicular + rayOutParallel;
     }
 
     private static float Reflectance(float cosine, float refractionRatio)
     {
         // Schlick's approximation
-        float r0 = (1 - refractionRatio) / (1 + refractionRatio);
+        var r0 = (1 - refractionRatio) / (1 + refractionRatio);
         r0 *= r0;
         return r0 + (1 - r0) * MathF.Pow(1 - cosine, 5);
     }

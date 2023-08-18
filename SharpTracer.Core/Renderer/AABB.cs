@@ -16,9 +16,9 @@ public class AABB
     public bool IsHit(Ray ray, float tMin, float tMax)
     {
         {
-            float invD = 1f / ray.Direction.X;
-            float t0 = (Min.X - ray.Origin.X) * invD;
-            float t1 = (Max.X - ray.Origin.X) * invD;
+            var invD = 1f / ray.Direction.X;
+            var t0 = (Min.X - ray.Origin.X) * invD;
+            var t1 = (Max.X - ray.Origin.X) * invD;
             if (invD < 0f)
             {
                 (t0, t1) = (t1, t0);
@@ -32,9 +32,9 @@ public class AABB
             }
         }
         {
-            float invD = 1f / ray.Direction.Y;
-            float t0 = (Min.Y - ray.Origin.Y) * invD;
-            float t1 = (Max.Y - ray.Origin.Y) * invD;
+            var invD = 1f / ray.Direction.Y;
+            var t0 = (Min.Y - ray.Origin.Y) * invD;
+            var t1 = (Max.Y - ray.Origin.Y) * invD;
             if (invD < 0f)
             {
                 (t0, t1) = (t1, t0);
@@ -48,9 +48,9 @@ public class AABB
             }
         }
         {
-            float invD = 1f / ray.Direction.Z;
-            float t0 = (Min.Z - ray.Origin.Z) * invD;
-            float t1 = (Max.Z - ray.Origin.Z) * invD;
+            var invD = 1f / ray.Direction.Z;
+            var t0 = (Min.Z - ray.Origin.Z) * invD;
+            var t1 = (Max.Z - ray.Origin.Z) * invD;
             if (invD < 0f)
             {
                 (t0, t1) = (t1, t0);

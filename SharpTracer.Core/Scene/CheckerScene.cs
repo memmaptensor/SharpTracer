@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using SharpTracer.Core.Geometry;
 using SharpTracer.Core.Material;
 using SharpTracer.Core.Texture;
@@ -12,8 +11,8 @@ public class CheckerScene : IScene
     public HittableGroup Render()
     {
         HittableGroup world = new();
-        Color evenColor = ColorHelper.FromRGBAF(0.2f, 0.3f, 0.1f);
-        Color oddColor = ColorHelper.FromRGBAF(0.9f, 0.9f, 0.9f);
+        var evenColor = ColorHelper.FromRGBAF(0.2f, 0.3f, 0.1f);
+        var oddColor = ColorHelper.FromRGBAF(0.9f, 0.9f, 0.9f);
         CheckerboardTexture checkerboardTex = new(oddColor, evenColor);
         TexturedMaterial sphereMat = new(checkerboardTex);
 

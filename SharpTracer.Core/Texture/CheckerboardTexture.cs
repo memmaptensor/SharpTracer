@@ -22,7 +22,7 @@ public class CheckerboardTexture : ITexture
 
     public Color FromUV(Vector2 uv, Vector3 p)
     {
-        float sines = MathF.Sin(10f * p.X) * MathF.Sin(10f * p.Y) * MathF.Sin(10f * p.Z);
+        var sines = MathF.Sin(10f * p.X) * MathF.Sin(10f * p.Y) * MathF.Sin(10f * p.Z);
 
         if (sines < 0)
         {

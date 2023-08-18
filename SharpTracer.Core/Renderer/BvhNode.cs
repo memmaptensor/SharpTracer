@@ -13,12 +13,12 @@ public class BvhNode : IHittable
     public BvhNode(List<IHittable> src, int start, int end, float time0, float time1)
     {
         List<IHittable> obj = new(src);
-        int axis = Random.Shared.Next(0, 3);
-        BoxCompare comparator =
+        var axis = Random.Shared.Next(0, 3);
+        var comparator =
             axis == 0 ? new BoxCompare(0) :
             axis == 1 ? new BoxCompare(1) :
             new BoxCompare(2);
-        int objectSpan = end - start;
+        var objectSpan = end - start;
 
         if (objectSpan == 1)
         {
@@ -40,13 +40,13 @@ public class BvhNode : IHittable
         else
         {
             obj.Sort(start, end - start, comparator);
-            int mid = start + objectSpan / 2;
+            var mid = start + objectSpan / 2;
             Left = new BvhNode(obj, start, mid, time0, time1);
             Right = new BvhNode(obj, mid, end, time0, time1);
         }
 
-        AABB boxLeft = Left.BoundingBox(time0, time1);
-        AABB boxRight = Right.BoundingBox(time0, time1);
+        var boxLeft = Left.BoundingBox(time0, time1);
+        var boxRight = Right.BoundingBox(time0, time1);
 
         if (boxLeft is null || boxRight is null)
         {
@@ -68,8 +68,8 @@ public class BvhNode : IHittable
             return false;
         }
 
-        bool hitLeft = Left.Hit(ray, tMin, tMax, ref hit);
-        bool hitRight = Right.Hit(ray, tMin, hitLeft ? hit.T : tMax, ref hit);
+        var hitLeft = Left.Hit(ray, tMin, tMax, ref hit);
+        var hitRight = Right.Hit(ray, tMin, hitLeft ? hit.T : tMax, ref hit);
 
         return hitLeft || hitRight;
     }

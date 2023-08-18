@@ -11,10 +11,10 @@ public class HittableGroup : IHittable
     public bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
         HitRecord tempHit = new();
-        bool hitAnything = false;
-        float closestSoFar = tMax;
+        var hitAnything = false;
+        var closestSoFar = tMax;
 
-        foreach (IHittable hittable in HittableList)
+        foreach (var hittable in HittableList)
         {
             if (hittable.Hit(ray, tMin, closestSoFar, ref tempHit))
             {
@@ -35,11 +35,11 @@ public class HittableGroup : IHittable
         }
 
         AABB outputBox = null;
-        bool firstBox = true;
+        var firstBox = true;
 
-        foreach (IHittable obj in HittableList)
+        foreach (var obj in HittableList)
         {
-            AABB tempBox = obj.BoundingBox(time0, time1);
+            var tempBox = obj.BoundingBox(time0, time1);
             if (tempBox is null)
             {
                 return null;

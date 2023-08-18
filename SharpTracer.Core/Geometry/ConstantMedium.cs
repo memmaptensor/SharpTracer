@@ -53,9 +53,9 @@ public class ConstantMedium : IHittableMat
             hit1.T = 0;
         }
 
-        float rayLength = ray.Direction.Length();
-        float distanceInsideBoundary = (hit2.T - hit1.T) * rayLength;
-        float hitDistance = NegInvDensity * MathF.Log(Random.Shared.NextSingle());
+        var rayLength = ray.Direction.Length();
+        var distanceInsideBoundary = (hit2.T - hit1.T) * rayLength;
+        var hitDistance = NegInvDensity * MathF.Log(Random.Shared.NextSingle());
 
         if (hitDistance > distanceInsideBoundary)
         {

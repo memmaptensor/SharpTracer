@@ -22,12 +22,12 @@ public class Camera
         _time0 = time0;
         _time1 = time1;
 
-        float theta = fov.ToRadians();
-        float h = MathF.Tan(theta / 2f);
-        float viewportHeight = 2f * h;
-        float viewportWidth = AspectRatio * viewportHeight;
+        var theta = fov.ToRadians();
+        var h = MathF.Tan(theta / 2f);
+        var viewportHeight = 2f * h;
+        var viewportWidth = AspectRatio * viewportHeight;
 
-        Vector3 vup = Vector3.UnitY;
+        var vup = Vector3.UnitY;
         _w = Vector3.Normalize(Origin - lookAt);
         _u = Vector3.Normalize(Vector3.Cross(vup, _w));
         _v = Vector3.Cross(_w, _u);
@@ -52,10 +52,10 @@ public class Camera
 
     public Ray GetRay(float s, float t)
     {
-        Vector3 rd = LensRadius * RandomInUnitDisk();
-        Vector3 offset = _u * rd.X + Vertical * rd.Y;
+        var rd = LensRadius * RandomInUnitDisk();
+        var offset = _u * rd.X + Vertical * rd.Y;
 
-        float randomTime = FloatHelper.Lerp(_time0, _time1, Random.Shared.NextSingle());
+        var randomTime = FloatHelper.Lerp(_time0, _time1, Random.Shared.NextSingle());
         return new Ray(Origin + offset, LowerLeftCorner + s * Horizontal + t * Vertical - Origin - offset, randomTime);
     }
 
@@ -63,8 +63,8 @@ public class Camera
     {
         while (true)
         {
-            float a = Random.Shared.NextSingle() * 2f - 1f;
-            float b = Random.Shared.NextSingle() * 2f - 1f;
+            var a = Random.Shared.NextSingle() * 2f - 1f;
+            var b = Random.Shared.NextSingle() * 2f - 1f;
             Vector3 p = new(a, b, 0f);
             if (p.LengthSquared() < 1f)
             {

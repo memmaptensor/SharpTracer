@@ -13,8 +13,8 @@ public class BoxCompare : IComparer<IHittable>
         ArgumentNullException.ThrowIfNull(a);
         ArgumentNullException.ThrowIfNull(b);
 
-        AABB boxA = a.BoundingBox(0f, 0f);
-        AABB boxB = b.BoundingBox(0f, 0f);
+        var boxA = a.BoundingBox(0f, 0f);
+        var boxB = b.BoundingBox(0f, 0f);
 
         if (boxA is null || boxB is null)
         {

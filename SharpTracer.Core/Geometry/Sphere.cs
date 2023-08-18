@@ -22,20 +22,20 @@ public class Sphere : IHittableMat, IUVMap
 
     public virtual bool Hit(Ray ray, float tMin, float tMax, ref HitRecord hit)
     {
-        Vector3 oc = ray.Origin - Center;
-        float a = ray.Direction.LengthSquared();
-        float halfB = Vector3.Dot(oc, ray.Direction);
-        float c = oc.LengthSquared() - Radius * Radius;
-        float discriminant = halfB * halfB - a * c;
+        var oc = ray.Origin - Center;
+        var a = ray.Direction.LengthSquared();
+        var halfB = Vector3.Dot(oc, ray.Direction);
+        var c = oc.LengthSquared() - Radius * Radius;
+        var discriminant = halfB * halfB - a * c;
 
         if (discriminant < 0f)
         {
             return false;
         }
 
-        float sqrtD = MathF.Sqrt(discriminant);
+        var sqrtD = MathF.Sqrt(discriminant);
         // Nearest root within range
-        float root = (-halfB - sqrtD) / a;
+        var root = (-halfB - sqrtD) / a;
         if (root < tMin || tMax < root)
         {
             root = (-halfB + sqrtD) / a;
@@ -48,7 +48,7 @@ public class Sphere : IHittableMat, IUVMap
         hit = new HitRecord();
         hit.T = root;
         hit.Position = ray.At(root);
-        Vector3 outwardNormal = (hit.Position - Center) / Radius;
+        var outwardNormal = (hit.Position - Center) / Radius;
         hit.SetFaceNormal(ray, outwardNormal);
         hit.UV = GetUV(outwardNormal);
         hit.Material = Material;
@@ -66,11 +66,11 @@ public class Sphere : IHittableMat, IUVMap
 
     public Vector2 GetUV(Vector3 p)
     {
-        float theta = MathF.Acos(-p.Y);
-        float phi = MathF.Atan2(-p.Z, p.X) + MathF.PI;
+        var theta = MathF.Acos(-p.Y);
+        var phi = MathF.Atan2(-p.Z, p.X) + MathF.PI;
 
-        float u = phi / (2f * MathF.PI);
-        float v = theta / MathF.PI;
+        var u = phi / (2f * MathF.PI);
+        var v = theta / MathF.PI;
 
         return new Vector2(u, v);
     }

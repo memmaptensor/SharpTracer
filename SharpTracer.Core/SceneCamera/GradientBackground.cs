@@ -22,14 +22,14 @@ public class GradientBackground : ICameraBackground
     {
         if (IsHorizontalFade)
         {
-            Vector3 dir = Vector3.Normalize(ray.Direction);
-            float t = 0.5f * (dir.X + 1f);
+            var dir = Vector3.Normalize(ray.Direction);
+            var t = 0.5f * (dir.X + 1f);
             return (1f - t) * FirstColor.ToVector3() + t * SecondColor.ToVector3();
         }
         else
         {
-            Vector3 dir = Vector3.Normalize(ray.Direction);
-            float t = 0.5f * (dir.Y + 1f);
+            var dir = Vector3.Normalize(ray.Direction);
+            var t = 0.5f * (dir.Y + 1f);
             return (1f - t) * FirstColor.ToVector3() + t * SecondColor.ToVector3();
         }
     }

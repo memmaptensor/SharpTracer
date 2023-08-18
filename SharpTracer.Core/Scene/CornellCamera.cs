@@ -9,10 +9,13 @@ public class CornellCamera : IEyeView
     {
         Vector3 lookFrom = new(278f, 278f, -750f);
         Vector3 lookAt = new(278f, 278f, 0f);
-        float fov = 40f;
-        float distToFocus = Vector3.Distance(lookFrom, lookAt);
-        float aperture = 0.001f;
-        Camera camera = new(800, 800, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
+        var fov = 40f;
+        var distToFocus = /*Vector3.Distance(lookFrom, lookAt)*/10f;
+        var aperture = /*0.001f*/0f;
+        var time0 = 0.0f;
+        var time1 = 1.0f;
+
+        Camera camera = new( /*8*/2048, /*8*/2048, lookFrom, lookAt, fov, aperture, distToFocus, time0, time1);
 
         return camera;
     }
