@@ -12,7 +12,7 @@ public class TheNextWeekCamera : IEyeView
         var fov = 40f;
         var distToFocus = Vector3.Distance(lookFrom, lookAt);
         var aperture = 0.001f;
-        Camera camera = new(2560, 2560, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
+        Camera camera = new(1080, 1080, lookFrom, lookAt, fov, aperture, distToFocus, 0f, 1f);
 
         return camera;
     }
