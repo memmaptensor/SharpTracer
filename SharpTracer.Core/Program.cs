@@ -38,11 +38,11 @@ internal class Program
 
         RenderOptions options = new() { MaxDepth = 5, SamplesPerPixel = 500, Gamma = /*0.8f*/ 1f };
 
-        IScene scene = new CornellBoxScene();
+        IScene scene = new TheNextWeekScene();
         // HittableGroup world = scene.Render();
         BvhNode world = new(scene.Render(), 0f, 1f);
 
-        IEyeView eye = new CornellCamera();
+        IEyeView eye = new TheNextWeekCamera();
         var camera = eye.GetCamera();
 
         // Should really be called scene ambient light and not background

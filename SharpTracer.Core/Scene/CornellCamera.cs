@@ -15,7 +15,7 @@ public class CornellCamera : IEyeView
         var time0 = 0.0f;
         var time1 = 1.0f;
 
-        Camera camera = new( /*8*/2048, /*8*/2048, lookFrom, lookAt, fov, aperture, distToFocus, time0, time1);
+        Camera camera = new(800, 800, lookFrom, lookAt, fov, aperture, distToFocus, time0, time1);
 
         return camera;
     }
